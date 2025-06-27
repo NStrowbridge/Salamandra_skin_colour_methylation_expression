@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Define k-mer sizes to test, 25 is default, so 6 either side and then 10 above
 kmer_sizes=(19 25 31 41 51 61)
 
