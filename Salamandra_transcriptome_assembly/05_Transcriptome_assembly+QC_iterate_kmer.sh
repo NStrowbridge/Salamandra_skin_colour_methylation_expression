@@ -5,7 +5,7 @@ kmer_sizes=(19 25 31 41 51 61)
 
 # Define input files and directories
 base_dir="/export/home4/2694872s/DirectRNA/NS9/pychopper_NS9_dorado_qscore9_output/NS9_dorado_qscore9_trimmed_reads_kraken_conf0.9_rRNA"
-pychopper_trimmed="${base_dir}/NS9_dorado_qscore9_kraken+rRNAfiltered.fastq"
+pychopper_trimmed="${base_dir}/NS9_dorado_qscore9_kraken+rRNAfiltered.fastq" #File was renamed from NON_RRNA_READS of previous script
 output_base_dir="RNAbloom_assembly_qscore9_pychopper_kraken2_rRNAremoved"
 busco_lineage="tetrapoda_odb10"
 
