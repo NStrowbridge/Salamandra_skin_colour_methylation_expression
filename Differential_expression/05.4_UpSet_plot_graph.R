@@ -86,9 +86,9 @@ upset_plot_meth_expr <- upset(
   name = "Putative Gene Overlap",
   width_ratio = 0.25,
   base_annotations = list(
-    'Intersection size' = intersection_size(counts = FALSE)
-  )
-) +
+    'Intersection size' = intersection_size(counts = FALSE)),
+    stripes=c('yellow3','brown4', 'yellow3', 'yellow3','yellow3','brown4')
+  ) +
   theme(
     axis.text.y = element_markdown(size = 10)
   )
