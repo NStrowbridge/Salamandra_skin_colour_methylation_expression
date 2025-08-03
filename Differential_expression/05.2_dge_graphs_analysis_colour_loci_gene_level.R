@@ -70,8 +70,8 @@ map_yelvbla <- c("rb_62964" = "TYR.I", "rb_79752" = "TYRP1", "rb_92274" = "MLANA
 genes_brovbla <- c("rb_1531", "rb_78661", "rb_81552", "rb_15163")
 map_brovbla <- c("rb_1531" = "TYR.II", "rb_78661" = "GPNMB.I", "rb_15163" = "DGAT2")
 
-genes_yelvbro <- c("rb_76127", "rb_5385", "rb_78661", "rb_79752", "rb_92274", "rb_78195")
-map_yelvbro <- c("rb_76127" = "PAH", "rb_5385" = "TXN", "rb_78661" = "GPNMB.I", "rb_79752" = "TYRP1", "rb_92274" = "MLANA", "rb_78195" = "PMEL")
+genes_yelvbro <- c("rb_80163", "rb_5385", "rb_78661", "rb_79752", "rb_92274", "rb_78195")
+map_yelvbro <- c("rb_80163" = "CXCL12", "rb_5385" = "TXN", "rb_78661" = "GPNMB.I", "rb_79752" = "TYRP1", "rb_92274" = "MLANA", "rb_78195" = "PMEL")
 
 # Create plots
 plot1 <- create_volcano_plot(yelvbla, genes_yelvbla, map_yelvbla, "Yellow vs Black skin")
@@ -155,8 +155,8 @@ map_yelvbla <- c("rb_62964" = "TYR.I", "rb_79752" = "TYRP1", "rb_92274" = "MLANA
 genes_brovbla <- c("rb_1531", "rb_78661", "rb_15163")
 map_brovbla <- c("rb_1531" = "TYR.II", "rb_78661" = "GPNMB.I", "rb_15163" = "DGAT2")
 
-genes_yelvbro <- c("rb_76127", "rb_5385", "rb_78661", "rb_79752", "rb_92274", "rb_78195")
-map_yelvbro <- c("rb_76127" = "PAH", "rb_5385" = "TXN", "rb_78661" = "GPNMB.I", "rb_79752" = "TYRP1", "rb_92274" = "MLANA", "rb_78195" = "PMEL")
+genes_yelvbro <- c("rb_80163", "rb_5385", "rb_78661", "rb_79752", "rb_92274", "rb_78195")
+map_yelvbro <- c("rb_80163" = "CXCL12", "rb_5385" = "TXN", "rb_78661" = "GPNMB.I", "rb_79752" = "TYRP1", "rb_92274" = "MLANA", "rb_78195" = "PMEL")
 
 # Generate plots
 plot1 <- create_boxplot(yelvbla, ss, genes_yelvbla, map_yelvbla, c("Yellow", "Black"),"")

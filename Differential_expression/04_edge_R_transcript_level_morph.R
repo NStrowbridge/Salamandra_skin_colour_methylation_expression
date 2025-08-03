@@ -57,7 +57,7 @@ y = DGEList(cts, group = ss$Morph)
 y$samples$batch <- ss$Sequencing.kit
 y$samples$Individual <- ss$Individual
 design = model.matrix(~ group + batch, data = y$samples) #design for filtering
-keep1 = filterByExpr(y, design, min.count = 10) 
+keep1 = filterByExpr(y, design, min.count = 2) 
 y = y[keep1, ] #should keep only genes with ~2+ reads in at least one group for Direct RNA
 y$counts <- ComBat_seq(y$counts, batch = y$samples$batch )
 y = normLibSizes(y) #normalise DGEList for library size

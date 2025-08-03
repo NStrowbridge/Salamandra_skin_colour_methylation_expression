@@ -1,8 +1,13 @@
+# Relationship between expression and methylation
+# by Nic
+# for analysis of DGE DGM in yellow, brown and striped morphs
+
 # Load required libraries
 library(dplyr)
 library(ggplot2)
 library(ggrepel)
 library(patchwork)
+library(purrr)
 
 ####~housekeeping~~~~~~~~~~~~####
 
@@ -53,7 +58,7 @@ map_yelvbro <- c(
   "rb_27044" = "GPNMB.II",
   "rb_91883" = "ATOX1",
   "rb_81618" = "QDPR",
-  "rb_76127" = "PAH",
+  "rb_80163" = "CXCL12",
   "rb_5385" = "TXN",
   "rb_79752" = "TYRP1",
   "rb_92274" = "MLANA",
@@ -109,7 +114,7 @@ combined_df <- bind_rows(df1, df2, df3)
 combined_df$comparison <- factor(combined_df$comparison, levels = c("Yellow vs Black skin", "Brown vs Black skin", "Yellow vs Brown skin"))
 
 # Plot with facets
-p <- ggplot(combined_df, aes(x = expr_logFC, y = meth_logFC, color = category_sig)) +
+p <- ggplot(combined_df, aes(x = meth_logFC, y = expr_logFC, color = category_sig)) +
   geom_point(alpha = 0.7) +
   geom_label_repel(
     data = subset(combined_df, !is.na(label)),
@@ -130,8 +135,8 @@ p <- ggplot(combined_df, aes(x = expr_logFC, y = meth_logFC, color = category_si
   geom_hline(yintercept = c(-1, 1), linetype = "dotted", color = "grey40") +
   scale_color_manual(values = category_colors, drop = TRUE) +
   facet_wrap(~comparison) +
-  labs(x = "Expression log2(Fold change)",
-    y = "Methylation log2(Fold change)",
+  labs(y = "Expression log2(Fold change)",
+    x = "Methylation log2(Fold change)",
     color = "Classification"
   ) +
   theme_minimal(base_size = 36) +
@@ -153,18 +158,18 @@ p <- p +
     alpha = 0.2
   )
 # Save the plot
-ggsave("combined_facet_scatterplot.png", p, width = 24, height = 8)
+ggsave("combined_facet_scatterplot.svg", p, width = 24, height = 8)
 
-# 📊 Fit linear models for each comparison group
+# Fit linear models for each comparison group
 lm_results <- combined_df %>%
   group_by(comparison) %>%
   do({
-    model <- lm(meth_logFC ~ expr_logFC, data = .)
+    model <- lm(expr_logFC ~ meth_logFC, data = .)
     tidy_summary <- summary(model)
     data.frame(
       Comparison = unique(.$comparison),
-      Coefficient = tidy_summary$coefficients["expr_logFC", "Estimate"],
-      p_value = tidy_summary$coefficients["expr_logFC", "Pr(>|t|)"],
+      Coefficient = tidy_summary$coefficients["meth_logFC", "Estimate"],
+      p_value = tidy_summary$coefficients["meth_logFC", "Pr(>|t|)"],
       R_squared = tidy_summary$r.squared,
       stringsAsFactors = FALSE
     )
@@ -174,7 +179,7 @@ lm_results <- combined_df %>%
 print(lm_results)
 write.csv(lm_results, "lm_results.csv", row.names = FALSE)
 
-# Filter genes into four quadrants
+####~~~~Filter scatterplots to remove transcripts less > -1 and < 1~~~~####
 quadrant_df <- combined_df %>%
   filter(
     (expr_logFC > 1 & meth_logFC > 1) |
@@ -184,13 +189,13 @@ quadrant_df <- combined_df %>%
   )
 
 # Plot with regression lines
-p_quadrants <- ggplot(quadrant_df, aes(x = expr_logFC, y = meth_logFC, color = category_sig)) +
+p_quadrants <- ggplot(quadrant_df, aes(x = meth_logFC, y = expr_logFC, color = category_sig)) +
   geom_point(alpha = 0.7) +
   geom_label_repel(
     data = subset(quadrant_df, !is.na(label)),
     aes(label = label),
     fill = "white",
-    size = 12,
+    size = 6,
     box.padding = 0.6,
     point.padding = 0.4,
     segment.color = "grey50",
@@ -213,11 +218,11 @@ p_quadrants <- ggplot(quadrant_df, aes(x = expr_logFC, y = meth_logFC, color = c
   ) +
   scale_color_manual(values = category_colors, drop = TRUE) +
   facet_wrap(~comparison) +
-  labs(x = "Expression log2(Fold change)",
-       y = "Methylation log2(Fold change)",
+  labs(y = "Expression log2(Fold change)",
+       x = "Methylation log2(Fold change)",
        color = "Classification"
   ) +
-  theme_minimal(base_size = 36) +
+  theme_minimal(base_size = 24) +
   theme(
     legend.position = "right",
     panel.grid = element_blank(),
@@ -227,18 +232,18 @@ p_quadrants <- ggplot(quadrant_df, aes(x = expr_logFC, y = meth_logFC, color = c
   ylim(-10, 10)
 
 # Save the plot
-ggsave("quadrant_filtered_scatterplot_with_lm.png", p_quadrants, width = 24, height = 8)
+ggsave("quadrant_filtered_scatterplot_with_lm.svg", p_quadrants, width = 24, height = 8)
 
 # Run linear models for each comparison
 lm_quadrant_results <- quadrant_df %>%
   group_by(comparison) %>%
   do({
-    model <- lm(meth_logFC ~ expr_logFC, data = .)
+    model <- lm(expr_logFC ~ meth_logFC, data = .)
     tidy_summary <- summary(model)
     data.frame(
       Comparison = unique(.$comparison),
-      Coefficient = tidy_summary$coefficients["expr_logFC", "Estimate"],
-      p_value = tidy_summary$coefficients["expr_logFC", "Pr(>|t|)"],
+      Coefficient = tidy_summary$coefficients["meth_logFC", "Estimate"],
+      p_value = tidy_summary$coefficients["meth_logFC", "Pr(>|t|)"],
       R_squared = tidy_summary$r.squared,
       stringsAsFactors = FALSE
     )
@@ -248,9 +253,18 @@ lm_quadrant_results <- quadrant_df %>%
 print(lm_quadrant_results)
 write.csv(lm_quadrant_results, "lm_quadrant_filtered_results.csv", row.names = FALSE)
 
+# Save full LM results by comparison group
+lm_results %>%
+  group_split(Comparison) %>%
+  walk(~ write.csv(.x, paste0("lm_results_", gsub(" ", "_", unique(.x$Comparison)), ".csv"), row.names = FALSE))
 
-####~~~~Test for overlap in datasets betwene methylation and expression using chi-square test~~~~####
-run_chi_sq_overlap <- function(expr_df, meth_df, comparison_name) {
+# Same for quadrant-filtered models
+lm_quadrant_results %>%
+  group_split(Comparison) %>%
+  walk(~ write.csv(.x, paste0("lm_quadrant_results_", gsub(" ", "_", unique(.x$Comparison)), ".csv"), row.names = FALSE))
+
+####~~~~Test for overlap in datasets between methylation and expression using Fisher's Exact Test~~~~####
+run_fisher_overlap_summary <- function(expr_df, meth_df, comparison_name) {
   expr_sig_genes <- rownames(expr_df[expr_df$sigFDR == TRUE, ])
   meth_sig_genes <- rownames(meth_df[meth_df$sigFDR == TRUE, ])
   all_genes <- union(rownames(expr_df), rownames(meth_df))
@@ -262,19 +276,25 @@ run_chi_sq_overlap <- function(expr_df, meth_df, comparison_name) {
   )
   
   contingency <- table(overlap_table$expr_sig, overlap_table$meth_sig)
-  chi_result <- chisq.test(contingency)
+  fisher_result <- fisher.test(contingency)
   
-  cat("\nChi-squared test for overlap between significant expression and methylation:", comparison_name, "\n")
-  print(chi_result)
-  
-  # Optional: Save to file
-  sink(paste0("chi_squared_overlap_", gsub(" ", "_", comparison_name), ".txt"))
-  cat("Chi-squared test for overlap between significant expression and methylation:", comparison_name, "\n")
-  print(chi_result)
-  sink()
+  # Return key summary stats
+  return(data.frame(
+    Comparison = comparison_name,
+    Odds_Ratio = fisher_result$estimate,
+    CI_Lower = fisher_result$conf.int[1],
+    CI_Upper = fisher_result$conf.int[2],
+    P_Value = fisher_result$p.value
+  ))
 }
 
-# Run for each comparison
-run_chi_sq_overlap(expr_yelvbla, meth_yelvbla, "Yellow vs Black skin")
-run_chi_sq_overlap(expr_brovbla, meth_brovbla, "Brown vs Black skin")
-run_chi_sq_overlap(expr_yelvbro, meth_yelvbro, "Yellow vs Brown skin")
+# Collect results into a single table
+fisher_summary_table <- rbind(
+  run_fisher_overlap_summary(expr_yelvbla, meth_yelvbla, "Yellow vs Black"),
+  run_fisher_overlap_summary(expr_brovbla, meth_brovbla, "Brown vs Black"),
+  run_fisher_overlap_summary(expr_yelvbro, meth_yelvbro, "Yellow vs Brown")
+)
+
+# View or export table
+print(fisher_summary_table)
+write.csv(fisher_summary_table, "fisher_overlap_summary.csv", row.names = FALSE)
