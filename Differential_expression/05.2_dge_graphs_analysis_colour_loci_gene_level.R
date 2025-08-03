@@ -14,12 +14,12 @@ library(reshape2)
 rm(list=ls()) #clear the environment
 setwd("/Users/nicstrowbridge/Desktop/Nic_PhD_files_2/DirectRNA_Colour_bernardezi/Differential_expression/01_scripts") #set wd
 
-###~~output dir~~~~~~~~~~~~~~####
+####~~output dir~~~~~~~~~~~~~~####
 output = "../05.2_dge_graphs_analysis_colour_loci_gene_level/"
 dir.create(output) #make folder for output
 setwd(output)
 
-#~~~~make combined volcano plots~~~~~~~~~~~~###
+####~~~~make combined volcano plots~~~~~~~~~~~~####
 # Function to create volcano plot without legend
 create_volcano_plot <- function(data, genes_to_label, gene_name_mapping, title) {
   data$gene_label <- gene_name_mapping[rownames(data)]
@@ -98,7 +98,7 @@ combined_plot <- (plot1 + plot2 + plot3) + plot_layout(guides = "collect") & the
 # Save
 ggsave("combined_volcano_with_shared_legend.svg", combined_plot, width = 20, height = 6)
 
-#~~~~ Combine boxplots into a single figure with unified legend and axis labels ~~~~#
+####~~~~ Combine boxplots into a single figure with unified legend and axis labels ~~~~####
 # Define color mapping
 color_mapping <- c("Black" = "grey3", "Yellow" = "yellow3", "Brown" = "brown4")
 
@@ -240,8 +240,6 @@ final_layout <- plot_grid(
   rel_widths = c(1.4, 3) 
 )
 
-
-
 # Add labels directly to the ggdraw canvas
 final_labeled <- ggdraw(final_layout) +
   draw_plot_label(
@@ -255,23 +253,26 @@ final_labeled <- ggdraw(final_layout) +
 # Save the final figure
 ggsave("final_combined_figure_with_legends_labeled.svg", final_labeled, width = 16, height = 10)
 
+####~~~~Supplemental boxplots~~~~#####
+
 ##~~~~ Define gene set and mapping ~~~~#
 all_genes <- unique(c(genes_yelvbla, genes_brovbla, genes_yelvbro))
 all_gene_map <- c(map_yelvbla, map_brovbla, map_yelvbro)
 
 color_mapping <- c("Black" = "grey3", "Brown" = "brown4", "Yellow" = "yellow3")
 
-#~~~~ Filter Yellow samples from yelvbro using Morph column ~~~~#
+# Filter Yellow samples from yelvbro using Morph column
 yellow_samples <- ss[ss$Morph == "Yellow", "SampleID"]
 yellow_expression <- yelvbro[, yellow_samples]
 yellow_expression <- yellow_expression[, sapply(yellow_expression, is.numeric)]
 
-#~~~~ Filter Black and Brown samples from brovbla ~~~~#
-bb_samples <- intersect(colnames(brovbla), ss$SampleID)
+# Filter Black and Brown samples from brovbla using condition
+bb_samples <- ss[ss$Condition %in% c("Black", "Brown"), "SampleID"]
+bb_samples <- intersect(bb_samples, colnames(brovbla))
 bb_expression <- brovbla[, bb_samples]
 bb_expression <- bb_expression[, sapply(bb_expression, is.numeric)]
 
-#~~~~ Align gene sets and combine ~~~~#
+# Align gene sets and combine
 bb_expression_subset <- bb_expression[all_genes, , drop = FALSE]
 yellow_expression_subset <- yellow_expression[all_genes, , drop = FALSE]
 
@@ -279,30 +280,59 @@ yellow_expression_subset <- yellow_expression[all_genes, , drop = FALSE]
 bb_expression_subset <- bb_expression_subset[order(rownames(bb_expression_subset)), ]
 yellow_expression_subset <- yellow_expression_subset[order(rownames(yellow_expression_subset)), ]
 
-# Combine datasets
-combined_expression <- cbind(bb_expression_subset, yellow_expression_subset)
+# Ensure both datasets have the same row names
+common_rows <- intersect(rownames(bb_expression_subset), rownames(yellow_expression_subset))
+
+# Subset both datasets to only include matching rows
+bb_matched <- bb_expression_subset[common_rows, ]
+yellow_matched <- yellow_expression_subset[common_rows, ]
+
+# Combine the matched datasets column-wise
+combined_expression <- cbind(bb_matched, yellow_matched)
+
+# Save the final list of filtered genes
+filtered_genes <- common_rows
 
 # Match and reorder sample sheet
 combined_sample_sheet <- ss[ss$SampleID %in% colnames(combined_expression), ]
 combined_sample_sheet <- combined_sample_sheet[match(colnames(combined_expression), combined_sample_sheet$SampleID), ]
 
-#~~~~ Log2 transform and reformat ~~~~#
+# Log2 transform and reformat
 combined_log2 <- log2(combined_expression + 1)
-candidate_genes <- combined_log2[all_genes, , drop = FALSE]
+candidate_genes <- combined_log2[filtered_genes, , drop = FALSE]
 gene_data <- data.frame(t(candidate_genes))
 gene_data$sample_group <- combined_sample_sheet$Condition
 
+# Create filtered gene map using the filtered gene list
+filtered_gene_map <- all_gene_map[filtered_genes]
 gene_data_m <- melt(gene_data, id.vars = "sample_group")
-gene_data_m$variable <- all_gene_map[gene_data_m$variable]
+gene_data_m$variable <- filtered_gene_map[gene_data_m$variable]
 
-#~~~~ Plot ~~~~#
+
+# Plot boxplots
 boxplot_all <- ggplot(gene_data_m, aes(x = variable, y = value, fill = sample_group)) +
   geom_boxplot(outlier.size = 0) +
   theme_classic() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1), text = element_text(size = 16)) +
-  labs(title = "Expression of Candidate Genes Across Skin Colours", 
-       y = "log2(Expression + 1)", x = "Gene") +
+  labs(y = "log2(Expression + 1)", x = "Gene") +
   scale_fill_manual(values = color_mapping, drop = FALSE)
 
 # Save plot
-ggsave("combined_all_colours_boxplot.svg", boxplot_all, width = 12, height = 6)
+
+# Add legend to the combined_all_colours_boxplot
+legend_dummy <- ggplot(
+  data.frame(skin_colour = factor(c("Black", "Brown", "Yellow"), levels = c("Black", "Brown", "Yellow"))),
+  aes(x = skin_colour, fill = skin_colour)
+) +
+  geom_bar() +
+  scale_fill_manual(
+    values = c("Black" = "grey3", "Brown" = "brown4", "Yellow" = "yellow3"),
+    drop = FALSE,
+    name = "Skin colour"
+  ) +
+  theme_void() +
+  theme(legend.position = "right")
+
+legend_all <- get_legend(legend_dummy)
+boxplot_all_with_legend <- plot_grid(boxplot_all + theme(legend.position = "none"), legend_all, ncol = 2, rel_widths = c(3, 0.5))
+ggsave("combined_all_colours_boxplot.svg", boxplot_all_with_legend, width = 12, height = 6)
