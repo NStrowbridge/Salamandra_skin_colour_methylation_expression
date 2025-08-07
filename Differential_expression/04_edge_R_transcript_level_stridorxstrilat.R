@@ -16,7 +16,7 @@ rm(list=ls()) #clear the environment
 setwd("/Users/nicstrowbridge/Desktop/Nic_PhD_files_2/DirectRNA_Colour_bernardezi/Differential_expression/01_scripts") #set wd to Scripts folder
 
 ###~~output directory~~~~~~~~####
-output = "../04_edge_R_transcript_level_skin_colour/" #specify where the output should go
+output = "../04_edge_R_transcript_level_skin_stridorxstrilat/" #specify where the output should go
 dir.create(output) #create directory for output
 setwd(output) #set the new output directory as the working directory
 
@@ -36,10 +36,6 @@ ss = read.csv(paste(refdata,"sample_sheet.csv",sep = ""), row.names = 1)
 
 ###~~quant files~~~~~~~~~~~~~####
 
-##~~~import txname by geneid~~~~~~~~~~~~#### Y
-txname_geneid = read.csv("../02_reference_data/txname_geneid.csv")
-txname_geneid <- txname_geneid[-c(1)]
-
 ##~~~load quant files~~~~~~~~####
 salmonQuantFiles = file.path("../03_salmon_data",paste(ss$RunID),"quant.sf") #makes a list of filepaths to the quant data
 names(salmonQuantFiles) = row.names(ss) #associate filepaths with sampleIDs from ss 
@@ -53,7 +49,7 @@ ss <- ss[match(sample_ids, ss$RunID), ]
 
 ####~prepare DGEList (condiition = skin colour) ~~~~~~~~~####
 cts <- as.matrix(cts)
-y = DGEList(cts, group = ss$Condition)
+y = DGEList(cts, group = ss$Morph.landmark)
 y$samples$batch <- ss$Sequencing.kit
 y$samples$Individual <- ss$Individual
 design = model.matrix(~ group, data = y$samples) #design for filtering
@@ -84,7 +80,7 @@ dev.off()
 
 ####~GLM analysis of DGE~~~~~####
 
-###~~fit GLM (skin colour)~~~~~~~~~~~~~~~~~####
+###~~fit GLM (morphxlandmark)~~~~~~~~~~~~~~~~~####
 # Create the design matrix
 design <- model.matrix(~ 0 + group, data = y$samples)
 colnames(design) <- levels(factor(make.names(y$samples$group)))
@@ -98,26 +94,15 @@ corfit <- duplicateCorrelation(counts_matrix, design, block = y$samples$Individu
 # Fit the GLM with the estimated correlation
 fit = glmQLFit(y, design, correlation = corfit$consensus)
 
-###~~compare groups (skin)~~~~~~~~~~####
+###~~compare groups (morph.landmark)~~~~~~~~~~####
 my.contrasts = makeContrasts(
-  YelvBla = Yellow-Black, #compare yellow skin vs black
-  YelvBro = Yellow-Brown,#compare yellow vs brown
-  BrovBla = Brown-Black, #compare brown vs black
+  Stri_dorvStri_lat = Striped_dor-Striped_lat,
   levels = design)
-qlf.YelvBla = glmQLFTest(fit, contrast=my.contrasts[,"YelvBla"])
-qlf.YelvBro = glmQLFTest(fit, contrast=my.contrasts[,"YelvBro"])
-qlf.BrovBla = glmQLFTest(fit, contrast=my.contrasts[,"BrovBla"])
-
-###~~get DGE results (skin)~~~~~~~~~####
-res.YelvBla = topTags(qlf.YelvBla , n=nrow(y), sort.by = "PValue")
-res.YelvBro = topTags(qlf.YelvBro, n=nrow(y), sort.by = "PValue")
-res.BrovBla = topTags(qlf.BrovBla, n=nrow(y), sort.by = "PValue")
-
-##~~~write out DGE tables (skin)~~~~####
-write.csv(res.YelvBla, "results_YelvBla.csv")
-write.csv(res.YelvBro, "results_YelvBro.csv")
-write.csv(res.BrovBla, "results_BrovBla.csv")
-
+qlf.Stri_dorvStri_lat = glmQLFTest(fit, contrast=my.contrasts[,"Stri_dorvStri_lat"])
+###~~get DGE results (Morph,landmark)~~~~~~~~~####
+res.Stri_dorvStri_lat = topTags(qlf.Stri_dorvStri_lat, n=nrow(y), sort.by = "PValue")
+##~~~write out DGE tables (morph.landmark~~~~####
+write.csv(res.Stri_dorvStri_lat, "results_Stri_dorvStri_lat.csv")
 ####~fin~~~~~~~~~~~~~~~~~~~~~####
 closeAllConnections()
 

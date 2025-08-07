@@ -16,7 +16,7 @@ setwd("/Users/nicstrowbridge/Desktop/Nic_PhD_files_2/DirectRNA_Colour_bernardezi
 count = 00
 
 ###~~output dir~~~~~~~~~~~~~~####
-output = "../06_dm_analysis_skin_transcript_level_morph/"
+output = "../06_dm_analysis_skin_transcript_level_stridorvstrilat/"
 dir.create(output) #make folder for output
 setwd(output)
 
