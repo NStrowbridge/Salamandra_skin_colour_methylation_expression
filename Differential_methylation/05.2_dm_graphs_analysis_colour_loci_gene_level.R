@@ -16,8 +16,7 @@ output = "../05.2_dm_graphs_analysis_colour_loci_gene_level/"
 dir.create(output) #make folder for output
 setwd(output)
 
-####~~~~make combined volcano plots~~~~####
-
+####~~~~make combined differential methylation volcano plots~~~~####
 
 # Function to create volcano plot without legend
 create_volcano_plot <- function(data, genes_to_label, gene_name_mapping, title) {
@@ -98,7 +97,7 @@ combined_plot <- (plot1 + plot2 + plot3) + plot_layout(guides = "collect") & the
 ggsave("combined_volcano_with_shared_legend.svg", combined_plot, width = 20, height = 6)
 
 
-# Combine boxplots into a single figure with unified legend and axis labels
+####~~~~make combined differential methylation boxplots~~~~####
 # Define color mapping
 color_mapping <- c("Black" = "grey3", "Yellow" = "yellow3", "Brown" = "brown4")
 
@@ -202,6 +201,7 @@ final_plot <- plot_grid(combined_boxplot, legend, ncol = 2, rel_widths = c(3, 0.
 # Save the final plot
 ggsave("combined_boxplot_with_single_legend.svg", final_plot, width = 20, height = 6)
 
+####~~~~make combined differential methylation volcano and boxplot together~~~~####
 # Rename volcano plots
 volcano1 <- create_volcano_plot(yelvbla, genes_yelvbla, map_yelvbla, "Yellow vs Black skin")
 volcano2 <- create_volcano_plot(brovbla, genes_brovbla, map_brovbla, "Brown vs Black skin")
@@ -243,8 +243,6 @@ final_layout <- plot_grid(
   ncol = 1,
   rel_widths = c(1.4, 3) 
 )
-
-
 
 # Add labels directly to the ggdraw canvas
 final_labeled <- ggdraw(final_layout) +
