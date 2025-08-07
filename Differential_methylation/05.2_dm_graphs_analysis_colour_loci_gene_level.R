@@ -107,12 +107,12 @@ create_boxplot <- function(methylation_data, sample_sheet, gene_ids, gene_name_m
   # Remove non-numeric columns
   methylation_data <- methylation_data[, sapply(methylation_data, is.numeric)]
   
-  # Ensure sample names match between expression data and sample sheet
+  # Ensure sample names match between methylation data and sample sheet
   common_samples <- intersect(colnames(methylation_data), sample_sheet$SampleID)
   methylation_data <- methylation_data[, common_samples]
   sample_sheet <- sample_sheet[sample_sheet$SampleID %in% common_samples, ]
   
-  # Reorder sample sheet to match expression data
+  # Reorder sample sheet to match methylation data
   sample_sheet <- sample_sheet[match(common_samples, sample_sheet$SampleID), ]
   
   # Log2 transform
@@ -142,7 +142,7 @@ create_boxplot <- function(methylation_data, sample_sheet, gene_ids, gene_name_m
 
 # Load sample sheet
 
-ss <- read.csv("/Users/nicstrowbridge/Desktop/Nic_PhD_files_2/DirectRNA_Colour_bernardezi/Differential_expression/02_reference_data/sample_sheet.csv")
+ss <- read.csv("/Users/nicstrowbridge/Desktop/Nic_PhD_files_2/DirectRNA_Colour_bernardezi/Differential_methylation/02_reference_data/sample_sheet.csv")
 
 # Load DM data
 
@@ -259,7 +259,7 @@ final_labeled <- ggdraw(final_layout) +
 # Save the final figure
 ggsave("final_combined_figure_with_legends_labeled.svg", final_labeled, width = 16, height = 10)
 
-####~~~~Supplemental boxplots~~~~####
+####~~~~Supplemental boxplots for all pigment genes~~~~####
 
 # Define gene set and mapping
 all_genes <- unique(c(genes_yelvbla, genes_brovbla, genes_yelvbro))
@@ -269,42 +269,42 @@ color_mapping <- c("Black" = "grey3", "Brown" = "brown4", "Yellow" = "yellow3")
 
 #Filter Yellow samples from yelvbro using Morph column
 yellow_samples <- ss[ss$Morph == "Yellow", "SampleID"]
-yellow_expression <- yelvbro[, yellow_samples]
-yellow_expression <- yellow_expression[, sapply(yellow_expression, is.numeric)]
+yellow_methylation <- yelvbro[, yellow_samples]
+yellow_methylation <- yellow_methylation[, sapply(yellow_methylation, is.numeric)]
 
 # Filter Black and Brown samples from brovbla using Condition column
 bb_samples <- ss[ss$Condition %in% c("Black", "Brown"), "SampleID"]
 bb_samples <- intersect(bb_samples, colnames(brovbla))
-bb_expression <- brovbla[, bb_samples]
-bb_expression <- bb_expression[, sapply(bb_expression, is.numeric)]
+bb_methylation <- brovbla[, bb_samples]
+bb_methylation <- bb_methylation[, sapply(bb_methylation, is.numeric)]
 
 # Align gene sets and combine
-bb_expression_subset <- bb_expression[all_genes, , drop = FALSE]
-yellow_expression_subset <- yellow_expression[all_genes, , drop = FALSE]
+bb_methylation_subset <- bb_methylation[all_genes, , drop = FALSE]
+yellow_methylation_subset <- yellow_methylation[all_genes, , drop = FALSE]
 
 # Order rows for consistency
-bb_expression_subset <- bb_expression_subset[order(rownames(bb_expression_subset)), ]
-yellow_expression_subset <- yellow_expression_subset[order(rownames(yellow_expression_subset)), ]
+bb_methylation_subset <- bb_methylation_subset[order(rownames(bb_methylation_subset)), ]
+yellow_methylation_subset <- yellow_methylation_subset[order(rownames(yellow_methylation_subset)), ]
 
 # Ensure both datasets have the same row names
-common_rows <- intersect(rownames(bb_expression_subset), rownames(yellow_expression_subset))
+common_rows <- intersect(rownames(bb_methylation_subset), rownames(yellow_methylation_subset))
 
 # Subset both datasets to only include matching rows
-bb_matched <- bb_expression_subset[common_rows, ]
-yellow_matched <- yellow_expression_subset[common_rows, ]
+bb_matched <- bb_methylation_subset[common_rows, ]
+yellow_matched <- yellow_methylation_subset[common_rows, ]
 
 # Combine the matched datasets column-wise
-combined_expression <- cbind(bb_matched, yellow_matched)
+combined_methylation <- cbind(bb_matched, yellow_matched)
 
 # Save the final list of filtered genes
 filtered_genes <- common_rows
 
 # Match and reorder sample sheet
-combined_sample_sheet <- ss[ss$SampleID %in% colnames(combined_expression), ]
-combined_sample_sheet <- combined_sample_sheet[match(colnames(combined_expression), combined_sample_sheet$SampleID), ]
+combined_sample_sheet <- ss[ss$SampleID %in% colnames(combined_methylation), ]
+combined_sample_sheet <- combined_sample_sheet[match(colnames(combined_methylation), combined_sample_sheet$SampleID), ]
 
 # Log2 transform and reformat
-combined_log2 <- log2(combined_expression + 1)
+combined_log2 <- log2(combined_methylation + 1)
 candidate_genes <- combined_log2[filtered_genes, , drop = FALSE]
 gene_data <- data.frame(t(candidate_genes))
 gene_data$sample_group <- combined_sample_sheet$Condition
@@ -321,7 +321,7 @@ boxplot_all <- ggplot(gene_data_m, aes(x = variable, y = value, fill = sample_gr
   geom_boxplot(outlier.size = 0) +
   theme_classic() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1), text = element_text(size = 16)) +
-  labs(y = "log2(Expression + 1)", x = "Gene") +
+  labs(y = "log2(methylation + 1)", x = "Gene") +
   scale_fill_manual(values = color_mapping, drop = FALSE)
 
 # Save plot
