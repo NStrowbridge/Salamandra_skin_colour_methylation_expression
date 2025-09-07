@@ -24,11 +24,6 @@ setwd(output) #set the new output directory as the working directory
 refdata = "../02_reference_data/" #specify where the reference data is kept
 saldata = "../04_n_mod_reads/" #specify where the modified read data is
 
-###~~logfile~~~~~~~~~~~~~~~~~####
-log_file=file(paste("03.1_variance_partitioning_methylation",Sys.Date(),".log",sep=""))
-sink(log_file,append=TRUE,type="output")
-sink(log_file,append=TRUE,type="message")
-
 ####~load data~~~~~~~~~~~~~~~####
 
 ###~~sample sheet~~~~~~~~~~~~####

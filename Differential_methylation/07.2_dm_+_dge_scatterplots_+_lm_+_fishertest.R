@@ -1,6 +1,6 @@
 # Relationship between expression and methylation
 # by Nic
-# for analysis of DGE DGM in yellow, brown and striped morphs
+# for analysis of DGE and DGM in yellow, brown and black skin
 
 # Load required libraries
 library(dplyr)

@@ -18,18 +18,12 @@ rm(list=ls()) #clear the environment
 setwd("/Users/nicstrowbridge/Desktop/Nic_PhD_files_2/DirectRNA_Colour_bernardezi/Differential_methylation/01_scripts") #set wd to Scripts folder
 
 ###~~output directory~~~~~~~~####
-output = "../04_edgeR_methylation_transcript_level_RNA004" #specify where the output should go
+output = "../04_edgeR_methylation_transcript_level" #specify where the output should go
 dir.create(output) #create directory for output
 setwd(output) #set the new output directory as the working directory
 
 ###~~specify data~~~~~~~~~~~~####
 refdata = "../02_reference_data/" #specify where the reference data is kept
-saldata = "../04_n_mod_reads/" #specify where the modified read data is
-
-###~~logfile~~~~~~~~~~~~~~~~~####
-#log_file=file(paste("01_edgeR_",Sys.Date(),".log",sep=""))
-#sink(log_file,append=TRUE,type="output")
-#sink(log_file,append=TRUE,type="message")
 
 ####~load data~~~~~~~~~~~~~~~####
 
@@ -37,57 +31,27 @@ saldata = "../04_n_mod_reads/" #specify where the modified read data is
 ss = read.csv(paste(refdata,"sample_sheet.csv",sep = ""), row.names = 1)
 
 ##~~~load filtered_n_mod_reads files~~~~~~~~####
-filtered_n_mod_reads_m6anet = read.csv("../03_m6anet_data/n_mod_reads_summedxtranscript_df.csv", header = TRUE)
+n_methylated_reads = read.csv("../04_n_methylated_reads/n_methylated_reads.csv", header = TRUE)
 # Set the first column as row names
-rownames(filtered_n_mod_reads_m6anet) <- filtered_n_mod_reads_m6anet$X
+rownames(n_methylated_reads) <- n_methylated_reads$X
 # Remove the first column
-filtered_n_mod_reads_m6anet <- filtered_n_mod_reads_m6anet[ , -1]
+n_methylated_reads <- n_methylated_reads[ , -1]
 
-# Function to rename columns
-rename_columns <- function(colname) {
-  # Extract the sample name
-  sample_name <- gsub(".*_m6a_|_total_n_mod_reads", "", colname)
-  
-  # Determine the suffix
-  suffix <- ifelse(grepl("_dor_", colname), "dor", "lat")
-  
-  # Check if the sample name consists only of numbers
-  if (grepl("^[0-9]+$", sample_name)) {
-    sample_name <- paste("ELT", sample_name, sep = "_")
-  }
-  
-  # Combine the sample name and suffix
-  paste(sample_name, suffix, sep = "_")
-}
-
-# Apply the function to all column names
-colnames(filtered_n_mod_reads_m6anet) <- sapply(colnames(filtered_n_mod_reads_m6anet), rename_columns)
 # Ensure column names match sample identifiers
-sample_ids <- colnames(filtered_n_mod_reads_m6anet)
+sample_ids <- colnames(n_methylated_reads)
 ss <- ss[match(sample_ids, ss$RunID), ]
 
-# Filter the sample sheet to keep only samples with Sequencing.Kit as RNA004
-filtered_ss <- ss[ss$Sequencing.kit == "RNA004", ]
-
-# Get the sample IDs that match the filtered sample sheet
-filtered_sample_ids <- filtered_ss$RunID
-write.csv(filtered_ss, "../02_reference_data/filtered_sample_sheet_RNA004.csv")
-
-# Filter the filtered_n_mod_reads_m6anet dataframe to keep only the columns that match the filtered sample IDs
-filtered_n_mod_reads_m6anet <- filtered_n_mod_reads_m6anet[, filtered_sample_ids]
-
-# Print the filtered dataframe
-print(filtered_n_mod_reads_m6anet)
-
-write.csv(filtered_n_mod_reads_m6anet, "n_mod_reads_transcript_level_RNA004.csv") #save gene counts
+write.csv(n_methylated_reads, "n_methylated_reads_transcript_level.csv") #save gene counts
 
 # Create DGEList object
-filtered_n_mod_reads_m6anet <- as.matrix(filtered_n_mod_reads_m6anet)
-y <- DGEList(filtered_n_mod_reads_m6anet, group = filtered_ss$Condition)
-y$samples$Individual <- filtered_ss$Individual
+n_methylated_reads <- as.matrix(n_methylated_reads)
+y <- DGEList(n_methylated_reads, group = ss$Condition)
+y$samples$batch <- ss$Sequencing.kit
+y$samples$Individual <- ss$Individual
 design = model.matrix(~ group, data = y$samples) #design for filtering
-keep1 = filterByExpr(y, design, min.count = 2) 
-y = y[keep1, ] #should keep only genes with ~2+ reads in at least one group for Direct RNA
+keep1 = filterByExpr(y, design, min.count = 15) 
+y = y[keep1, ] #should keep only genes with ~15+ reads in at least one group for Direct RNA methylation data
+y$counts <- ComBat_seq(y$counts, batch = y$samples$batch )
 y <- normLibSizes(y)
 y <- estimateDisp(y, design)
 sqrt(y$common.dispersion)
@@ -122,7 +86,6 @@ counts_matrix <- as.matrix(y$counts)
 
 # Estimate the correlation between duplicate measurements
 corfit <- duplicateCorrelation(counts_matrix, design, block = y$samples$Individual)
-
 # Fit the GLM with the estimated correlation
 fit = glmQLFit(y, design, correlation = corfit$consensus)
 
@@ -148,3 +111,4 @@ write.csv(res.BrovBla, "results_BrovBla.csv")
 
 ####~fin~~~~~~~~~~~~~~~~~~~~~####
 closeAllConnections()
+

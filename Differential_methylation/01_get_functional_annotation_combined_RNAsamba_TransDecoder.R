@@ -11,12 +11,6 @@ library(dplyr)
 rm(list=ls()) #clear the environment
 setwd("/Users/nicstrowbridge/Desktop/Nic_PhD_files_2/DirectRNA_Colour_bernardezi/Differential_methylation/02_reference_data") #set wd to reference data folder
 
-###~~logfile~~~~~~~~~~~~~~~~~####
-#log_file=file(paste("02_get_functional_annotation_",Sys.Date(),".log",sep=""))
-#sink(log_file,append=TRUE,type="output")
-#sink(log_file,append=TRUE,type="message")
-#Sys.time()
-
 ####~get eggnogg annotation~~####
 #transdecoder
 eggnog_transdecoder = read_excel("eggnogmapper_diamond_output_transdecoder_kmer19_transcriptID.emapper.annotations.xlsx", skip = 4)

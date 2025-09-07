@@ -16,23 +16,17 @@ setwd("/Users/nicstrowbridge/Desktop/Nic_PhD_files_2/DirectRNA_Colour_bernardezi
 count = 00
 
 ###~~output dir~~~~~~~~~~~~~~####
-output = "../06_dm_analysis_skin_transcript_level_stridorvstrilat/"
+output = "../06_dm_analysis_skin_transcript_level_morph/"
 dir.create(output) #make folder for output
 setwd(output)
 
 ###~~specify data~~~~~~~~~~~~####
 ss_file="../02_reference_data/sample_sheet.csv" #sample sheet
 #fa_file="../02_reference_data/functional_annotation.csv" #load eggnog mappings
-em_file="../04_edgeR_methylation_transcript_level_stridorvstrilat/cpm_skin.csv" #methylation matrix with CPM
-de_file_start="../04_edgeR_methylation_transcript_level_stridorvstrilat/results_" #differential methylation output from edgeR
-analyses = c("Stri_dorvStri_lat")
-custom_colors <- c("Striped_dor" = "yellow", "Stripd_lat" = "grey")
-
-###~~logfile~~~~~~~~~~~~~~~~~####
-#log_file=file(paste("05_dge_analysis_",Sys.Date(),".log",sep=""))
-#sink(log_file,append=TRUE,type="output")
-#sink(log_file,append=TRUE,type="message")
-#Sys.time()
+em_file="../04_edgeR_methylation_transcript_level_morph/cpm_skin.csv" #methylation matrix with CPM
+de_file_start="../04_edgeR_methylation_transcript_level_morph/results_" #differential methylation output from edgeR
+analyses = c("BrovStri", "YelvBroM", "YelvStri")
+custom_colors <- c("Yellow" = "yellow", "Striped" = "grey", "Brown" = "brown")
 
 ####~big loop~~~~~~~~~~~~~~~~####
 for (analysis in analyses) {
@@ -48,8 +42,8 @@ for (analysis in analyses) {
   
   ####~load data~~~~~~~~~~~~~~~####
   ss=read.csv(ss_file,row.names=1) #loads sample sheet
-  em=read.csv(em_file,row.names=1) #loads expression matrix
-  de=read.csv(paste(de_file_start,analysis,".csv",sep = ""),row.names=1) #loads differential expression
+  em=read.csv(em_file,row.names=1) #loads methylation matrix
+  de=read.csv(paste(de_file_start,analysis,".csv",sep = ""),row.names=1) #loads differential methylation
   setwd(anal_dir) #output will now go to the directory for the current analyses
   
   ####~parse data~~~~~~~~~~~~~~####
@@ -58,7 +52,7 @@ for (analysis in analyses) {
     df[order_of_x,]
   }
   
-  ###~~expression matrix~~~~~~~####
+  ###~~methylation matrix~~~~~~~####
   em = em[,row.names(ss)]#select and reorder columns in em based on row names in ss
   em_scaled=data.frame(scale(data.frame(em)))
   em_scaled=na.omit(em_scaled)
@@ -98,16 +92,49 @@ for (analysis in analyses) {
   master_fdr_down=subset(master_fdr, logFC<0)
   master_fdr_non_sig=subset(master,sigFDR==FALSE)
   
-  ##~~~remake master~~~~~~~~~~~####
-  master_non_sig$direction="ns"
-  master_sig_up$direction="up"
-  master_sig_down$direction="down"
+  # Check if there are any significant upregulated genes
+  if (nrow(master_sig_up) > 0) {
+    master_sig_up$direction="up"
+  } else {
+    master_sig_up <- data.frame() # Create an empty data frame if no significant upregulated genes
+  }
+  
+  # Check if there are any significant downregulated genes
+  if (nrow(master_sig_down) > 0) {
+    master_sig_down$direction="down"
+  } else {
+    master_sig_down <- data.frame() # Create an empty data frame if no significant downregulated genes
+  }
+  
+  # Combine significant up and downregulated genes
   master_sig=rbind(master_sig_up,master_sig_down)
+  
+  # Add non-significant genes
+  master_non_sig$direction="ns"
   master=rbind(master_sig,master_non_sig)
   master$direction=factor(master$direction,levels=c("up","down","ns"))
-  master_fdr_non_sig$direction="ns"
-  master$direction=factor(master$direction,levels=c("up","down","ns"))
   
+  # Check if there are any significant upregulated genes (FDR)
+  if (nrow(master_fdr_up) > 0) {
+    master_fdr_up$direction="up"
+  } else {
+    master_fdr_up <- data.frame() # Create an empty data frame if no significant upregulated genes (FDR)
+  }
+  
+  # Check if there are any significant downregulated genes (FDR)
+  if (nrow(master_fdr_down) > 0) {
+    master_fdr_down$direction="down"
+  } else {
+    master_fdr_down <- data.frame() # Create an empty data frame if no significant downregulated genes (FDR)
+  }
+  
+  # Combine significant up and downregulated genes (FDR)
+  master_fdr_sig=rbind(master_fdr_up,master_fdr_down)
+  
+  # Add non-significant genes (FDR)
+  master_fdr_non_sig$direction="ns"
+  master=rbind(master_fdr_sig,master_fdr_non_sig)
+  master$direction=factor(master$direction,levels=c("up","down","ns"))
   ##~~~write out masters~~~~~~~####
   write.csv(master, file = "master.csv")
   write.csv(master_sig, file = "sig.csv")
@@ -148,10 +175,11 @@ for (analysis in analyses) {
   write(genes_sig_down, "genes_sig_down.txt")
   genes_sig_fdr = row.names(master_fdr)
   write(genes_sig_fdr, "genes_sig_fdr.txt")
-  genes_fdr_down = row.names(master_fdr_down)
-  write(genes_fdr_down, "genes_fdr_down.txt")
   genes_fdr_up = row.names(master_fdr_up)
   write(genes_fdr_up, "genes_fdr_up.txt")
+  genes_fdr_down = row.names(master_fdr_down)
+  write(genes_fdr_down, "genes_fdr_down.txt")
+  
   
   
   ####~theme~~~~~~~~~~~~~~~~~~~####
@@ -169,7 +197,7 @@ for (analysis in analyses) {
   ####Prepare data for venn diagram
   fdr_threshold <- 0.10
   fdr.degs <- row.names(master_fdr[which(master_fdr$FDR <= fdr_threshold), ])
-  write(fdr.degs, "fdr_degs.txt")
+  write(fdr.degs, "fdr_degs.csv")
   
   ###~~MA~~~~~~~~~~~~~~~~~~~~~~####
   ma_plot=ggplot(master,aes(x=log10(mean),y=logFC,colour=direction))+
@@ -184,13 +212,13 @@ for (analysis in analyses) {
   ggsave("ma.svg",plot = ma_plot)
   
   ###~~volcano~~~~~~~~~~~~~~~~~####
-  volcano_plot=ggplot(master,aes(x=logFC,y=mlog10p,colour=direction))+
+  volcano_plot=ggplot(master,aes(x=logFC,y=mlog10FDR,colour=direction))+
     geom_point()+
-    labs(title="Volcano plot",x="Log Fold Change",y="Log P Value")+
+    labs(title="Volcano plot",x="Log Fold Change",y="Log FDR")+
     theme_bw()+
     geom_vline(xintercept=-1,linetype="dashed",colour="grey",size=0.5)+
     geom_vline(xintercept=1,linetype="dashed",colour="grey",size=0.5)+
-    geom_hline(yintercept=-log10(0.05),linetype="dashed",colour="grey")+
+    geom_hline(yintercept=-log10(0.1),linetype="dashed",colour="grey")+
     scale_colour_manual(values=c("red","blue","black"),labels=c("Up","Down","Non-sig"),name="")+
     geom_label_repel(data=top5_sig_up, aes(label=SYMBOL),show.legend=FALSE)+
     geom_label_repel(data=top5_sig_down, aes(label=SYMBOL),show.legend=FALSE)
@@ -210,12 +238,12 @@ for (analysis in analyses) {
   y.order=order.dendrogram(y.dd.reorder)
   hm.matrix_clustered=hm.matrix[y.order,]
   hm.matrix_clustered=melt(hm.matrix_clustered) #melt the matrix
-  names(hm.matrix_clustered)=c("gene","sample","expression")
+  names(hm.matrix_clustered)=c("gene","sample","methylation")
   
   #~~~~make the heatmap~~~~~~~~####
   colours=c("blue","grey","red")
   colorRampPalette(colours)(200)
-  hm=ggplot(hm.matrix_clustered,aes(x=sample,y=gene,fill=expression))+
+  hm=ggplot(hm.matrix_clustered,aes(x=sample,y=gene,fill=methylation))+
     geom_tile()+
     scale_fill_gradientn(colours=colorRampPalette(colours)(200))+
     ylab("")+
@@ -253,7 +281,7 @@ for (analysis in analyses) {
   candidate_genes=as.vector(row.names(top20)) #get top 20 genes as a vector
   
   #~~~~make gene table~~~~~~~~~####
-  gene_data=data.frame(t(em_scaled[candidate_genes,]))
+  gene_data=data.frame(t(log2(em[candidate_genes,])))
   gene_data$sample_group=ss$Condition
   gene_data.m=melt(gene_data,id.vars = "sample_group")
   
@@ -406,4 +434,3 @@ for (analysis in analyses) {
   ####~close loop~~~~~~~~~~~~~~####
   setwd("..")
 }
-

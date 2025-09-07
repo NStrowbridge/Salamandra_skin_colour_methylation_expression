@@ -47,10 +47,6 @@ txi = tximport(salmonQuantFiles, type = "salmon", txOut = TRUE) #import salmon q
 cts = txi$counts #get gene counts for DGE
 write.csv(cts, "salmon_counts.csv") #save gene counts
 
-# Ensure column names match sample identifiers
-sample_ids <- colnames(cts)
-ss <- ss[match(sample_ids, ss$RunID), ]
-
 # Create a new column in ss based on Morph.landmark conditions
 ss$skin_colour <- ifelse(ss$Morph.landmark %in% c("Striped_dor", "Striped_yellow"), "Striped_yellow",
                          ifelse(ss$Morph.landmark %in% c("Yellow_lat", "Yellow_dor"), "Yellow_Yellow", NA))
@@ -58,31 +54,23 @@ ss$skin_colour <- ifelse(ss$Morph.landmark %in% c("Striped_dor", "Striped_yellow
 # Filter the dataframe to include only the relevant categories
 filtered_ss <- ss[ss$skin_colour %in% c("Striped_yellow", "Yellow_Yellow"), ]
 
+# Subset cts to include only samples in filtered_ss
+cts <- cts[, colnames(cts) %in% filtered_ss$RunID]
 
-# Filter the cts dataframe based on the filtered_ss samples
-filtered_cts <- cts[, filtered_ss$RunID]
+# Reorder columns to match filtered_ss$RunID exactly
+cts <- cts[, match(filtered_ss$RunID, colnames(cts))]
 
-# Prepare DGEList with the filtered data
-filtered_cts <- as.matrix(filtered_cts)
-y <- DGEList(filtered_cts, group = filtered_ss$skin_colour)
+####~prepare DGEList (condiition = skin colour) ~~~~~~~~~####
+cts <- as.matrix(cts)
+y = DGEList(cts, group = filtered_ss$skin_colour)
 y$samples$batch <- filtered_ss$Sequencing.kit
 y$samples$Individual <- filtered_ss$Individual
-
-# Design matrix for filtering
-design <- model.matrix(~ group, data = y$samples)
-
-# Filter by expression
-keep1 <- filterByExpr(y, design, min.count = 10)
-y <- y[keep1, ]
-
-# Batch correction
-y$counts <- ComBat_seq(y$counts, batch = y$samples$batch)
-
-# Normalize for library size
-y <- normLibSizes(y)
-
-# Estimate dispersion
-y <- estimateDisp(y, design)
+design = model.matrix(~ group, data = y$samples) #design for filtering
+keep1 = filterByExpr(y, design, min.count = 2) 
+y = y[keep1, ] #should keep only genes with ~2+ reads in at least one group for Direct RNA
+y$counts <- ComBat_seq(y$counts, batch = y$samples$batch )
+y = normLibSizes(y) #normalise DGEList for library size
+y = estimateDisp(y, design)
 sqrt(y$common.dispersion)
 
 

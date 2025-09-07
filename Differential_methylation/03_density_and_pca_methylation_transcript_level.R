@@ -12,22 +12,14 @@ library(ggrepel)
 
 rm(list=ls()) #clear the environment
 setwd("/Users/nicstrowbridge/Desktop/Nic_PhD_files_2/DirectRNA_Colour_bernardezi/Differential_methylation/01_scripts") #set wd to Scripts folderdir.create("../05_density_pca") #make folder for output
-dir.create("../05_density_pca_skin_colour_methylation_site_level") #make folder for output
-setwd("../05_density_pca_skin_colour_methylation_site_level") #set output folder as wd
+dir.create("../05_density_pca_skin_colour_methylation") #make folder for output
+setwd("../05_density_pca_skin_colour_methylation") #set output folder as wd
 
 ###~~specify data~~~~~~~~~~~~####
 
 ss_file=("../02_reference_data/sample_sheet.csv") #sample sheet
-em_file_skin=("../04_edger_methylation_site_level/cpm_skin.csv") #expression matrix with CPM
-log2cpm_file_skin=("../04_edger_methylation_site_level/log2cpm_skin.csv")
-
-
-###~~logfile~~~~~~~~~~~~~~~~~####
-
-log_file=file(paste("02_density_and_pca_",Sys.Date(),".log",sep=""))
-sink(log_file,append=TRUE,type="output")
-sink(log_file,append=TRUE,type="message")
-Sys.time()
+em_file_skin=("../04_edgeR_methylation_transcript_level/cpm_skin.csv") #expression matrix with CPM
+log2cpm_file_skin=("../04_edgeR_methylation_transcript_level/log2cpm_skin.csv")
 
 ####~load data~~~~~~~~~~~~~~~####
 
@@ -41,6 +33,7 @@ log2cpm_skin=read.csv(log2cpm_file_skin,row.names = 1)
 em_skin = em_skin[,row.names(ss)]
 
 #make a log10 expression matrix
+em_skin[em_skin == 0] <- 1
 log10cpm_skin = log10(em_skin)
 
 #make a scaled expression matrix
@@ -59,7 +52,6 @@ write.csv(em_skin,file="em_skin.csv")
 write.csv(em_scaled_skin,file="em_scaled_skin.csv")
 
 ####~theme~~~~~~~~~~~~~~~~~~~####
-
 js_theme=theme(
   plot.title=element_text(size=14),
   axis.text.x=element_text(size=10),
@@ -71,7 +63,6 @@ js_theme=theme(
 ####~make plots~~~~~~~~~~~~~~####
 
 ###~~density~~~~~~~~~~~~~~~~~####
-
 ##~~~faceted~~~~~~~~~~~~~~~~~####
 density_plot_skin=ggplot(em.m_skin,aes(x=log10(value),colour=variable))+
   geom_density(alpha=0.75)+
@@ -96,6 +87,35 @@ density_plot2_skin=ggplot(em.m_skin,aes(x=log10(value),colour=variable))+
 #~~~~save plot~~~~~~~~~~~~~~~####
 svglite("density_overlapping_skin.svg", width = 4, height = 4)
 print(density_plot2_skin)
+dev.off()
+
+##~~~expression data~~~~~~~~~####
+density_plot_expression_skin=ggplot(em.m_skin,aes(x=value,colour=variable))+
+  geom_density(alpha=0.75)+
+  js_theme+
+  xlim(-5,25)+
+  theme(strip.background=element_rect(fill="transparent",linewidth=0),
+        legend.position="right")+
+  labs(x="CPM",y="Density")
+
+#~~~~save plot~~~~~~~~~~~~~~~####
+svglite("density_methylation_skin.svg", width = 4, height = 4)
+print(density_plot_expression_skin)
+dev.off()
+
+##~~~faceted expression data~####
+density_plot_expression_faceted_skin=ggplot(em.m_skin,aes(x=value,colour=variable))+
+  geom_density(alpha=0.75)+
+  facet_wrap(~variable,ncol=6)+
+  js_theme+
+  xlim(-5,25)+
+  theme(strip.background=element_rect(fill="transparent",linewidth=0),
+        legend.position="none")+
+  labs(x="CPM",y="Density")
+
+#~~~~save plot~~~~~~~~~~~~~~~####
+svglite("density_faceted_methylation_skin.svg")
+print(density_plot_expression_faceted_skin)
 dev.off()
 
 ###~~boxplots~~~~~~~~~~~~~~~~####
@@ -181,3 +201,4 @@ pca_plot_5_6_skin
 
 ####~end of script~~~~~~~~~~~####
 closeAllConnections()
+

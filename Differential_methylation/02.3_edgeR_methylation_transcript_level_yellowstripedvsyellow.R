@@ -2,6 +2,7 @@
 # by Nic
 # for analysis of DGM in yellow, brown and striped morphs
 
+
 ####~load libraries~~~~~~~~~~####
 library(BiocManager)
 library(GenomicFeatures)
@@ -18,17 +19,12 @@ rm(list=ls()) #clear the environment
 setwd("/Users/nicstrowbridge/Desktop/Nic_PhD_files_2/DirectRNA_Colour_bernardezi/Differential_methylation/01_scripts") #set wd to Scripts folder
 
 ###~~output directory~~~~~~~~####
-output = "../04_edgeR_methylation_transcript_level_stridorvstrilat" #specify where the output should go
+output = "../04_edgeR_methylation_transcript_level_striyelvyelyel" #specify where the output should go
 dir.create(output) #create directory for output
 setwd(output) #set the new output directory as the working directory
 
 ###~~specify data~~~~~~~~~~~~####
 refdata = "../02_reference_data/" #specify where the reference data is kept
-
-###~~logfile~~~~~~~~~~~~~~~~~####
-#log_file=file(paste("01_edgeR_",Sys.Date(),".log",sep=""))
-#sink(log_file,append=TRUE,type="output")
-#sink(log_file,append=TRUE,type="message")
 
 ####~load data~~~~~~~~~~~~~~~####
 
@@ -48,11 +44,23 @@ ss <- ss[match(sample_ids, ss$RunID), ]
 
 write.csv(n_methylated_reads, "n_methylated_reads_transcript_level.csv") #save gene counts
 
-# Create DGEList object
-n_methylated_reads <- as.matrix(n_methylated_reads)
-y <- DGEList(n_methylated_reads, group = ss$Morph.landmark)
-y$samples$batch <- ss$Sequencing.kit
-y$samples$Individual <- ss$Individual
+# Create a new column in ss based on Morph.landmark conditions
+ss$skin_colour <- ifelse(ss$Morph.landmark %in% c("Striped_dor", "Striped_yellow"), "Striped_yellow",
+                         ifelse(ss$Morph.landmark %in% c("Yellow_lat", "Yellow_dor"), "Yellow_Yellow", NA))
+
+# Filter the dataframe to include only the relevant categories
+filtered_ss <- ss[ss$skin_colour %in% c("Striped_yellow", "Yellow_Yellow"), ]
+
+
+# Filter the cts dataframe based on the filtered_ss samples and match columns
+filtered_n_methylated_reads <- n_methylated_reads[, filtered_ss$RunID]
+filtered_n_methylated_reads <- filtered_n_methylated_reads[, match(filtered_ss$RunID, colnames(filtered_n_methylated_reads))]
+
+# Prepare DGEList with the filtered data
+filtered_n_methylated_reads <- as.matrix(filtered_n_methylated_reads)
+y <- DGEList(filtered_n_methylated_reads, group = filtered_ss$skin_colour)
+y$samples$batch <- filtered_ss$Sequencing.kit
+y$samples$Individual <- filtered_ss$Individual
 design = model.matrix(~ group, data = y$samples) #design for filtering
 keep1 = filterByExpr(y, design, min.count = 15) 
 y = y[keep1, ] #should keep only genes with ~15+ reads in at least one group for Direct RNA methylation data
@@ -60,6 +68,7 @@ y$counts <- ComBat_seq(y$counts, batch = y$samples$batch )
 y <- normLibSizes(y)
 y <- estimateDisp(y, design)
 sqrt(y$common.dispersion)
+
 
 ###~~get CPM (skin colour)~~~~~~~~~~~~~~~~~####
 cpms = edgeR::cpm(y, offset = y$offset, log = FALSE)
@@ -79,7 +88,8 @@ svglite("bcv.svg", width = 4, height = 4)
 plotBCV(y) #visualise dispersion estimates
 dev.off()
 
-####~GLM analysis of DM~~~~~####
+####~GLM analysis of DGE~~~~~####
+
 ###~~fit GLM (morphxlandmark)~~~~~~~~~~~~~~~~~####
 # Create the design matrix
 design <- model.matrix(~ 0 + group, data = y$samples)
@@ -96,12 +106,18 @@ fit = glmQLFit(y, design, correlation = corfit$consensus)
 
 ###~~compare groups (morph.landmark)~~~~~~~~~~####
 my.contrasts = makeContrasts(
-  Stri_dorvStri_lat = Striped_dor-Striped_lat,
+  Yel_strivYel_yel = Striped_yellow-Yellow_Yellow, 
   levels = design)
-qlf.Stri_dorvStri_lat = glmQLFTest(fit, contrast=my.contrasts[,"Stri_dorvStri_lat"])
+qlf.Yel_strivYel_yel = glmQLFTest(fit, contrast=my.contrasts[,"Yel_strivYel_yel"])
+
 ###~~get DGE results (Morph,landmark)~~~~~~~~~####
-res.Stri_dorvStri_lat = topTags(qlf.Stri_dorvStri_lat, n=nrow(y), sort.by = "PValue")
+res.Yel_strivYel_yel = topTags(qlf.Yel_strivYel_yel, n=nrow(y), sort.by = "PValue")
+
+
 ##~~~write out DGE tables (morph.landmark~~~~####
-write.csv(res.Stri_dorvStri_lat, "results_Stri_dorvStri_lat.csv")
+write.csv(res.Yel_strivYel_yel, "results_Yel_strivYel_yel.csv")
+
+
 ####~fin~~~~~~~~~~~~~~~~~~~~~####
 closeAllConnections()
+

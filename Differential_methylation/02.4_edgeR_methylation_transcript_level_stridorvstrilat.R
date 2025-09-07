@@ -18,17 +18,12 @@ rm(list=ls()) #clear the environment
 setwd("/Users/nicstrowbridge/Desktop/Nic_PhD_files_2/DirectRNA_Colour_bernardezi/Differential_methylation/01_scripts") #set wd to Scripts folder
 
 ###~~output directory~~~~~~~~####
-output = "../04_edgeR_methylation_transcript_level_morph" #specify where the output should go
+output = "../04_edgeR_methylation_transcript_level_stridorvstrilat" #specify where the output should go
 dir.create(output) #create directory for output
 setwd(output) #set the new output directory as the working directory
 
 ###~~specify data~~~~~~~~~~~~####
 refdata = "../02_reference_data/" #specify where the reference data is kept
-
-###~~logfile~~~~~~~~~~~~~~~~~####
-#log_file=file(paste("01_edgeR_",Sys.Date(),".log",sep=""))
-#sink(log_file,append=TRUE,type="output")
-#sink(log_file,append=TRUE,type="message")
 
 ####~load data~~~~~~~~~~~~~~~####
 
@@ -50,7 +45,7 @@ write.csv(n_methylated_reads, "n_methylated_reads_transcript_level.csv") #save g
 
 # Create DGEList object
 n_methylated_reads <- as.matrix(n_methylated_reads)
-y <- DGEList(n_methylated_reads, group = ss$Morph)
+y <- DGEList(n_methylated_reads, group = ss$Morph.landmark)
 y$samples$batch <- ss$Sequencing.kit
 y$samples$Individual <- ss$Individual
 design = model.matrix(~ group, data = y$samples) #design for filtering
@@ -79,9 +74,8 @@ svglite("bcv.svg", width = 4, height = 4)
 plotBCV(y) #visualise dispersion estimates
 dev.off()
 
-####~GLM analysis of DGE~~~~~####
-
-###~~fit GLM (skin colour)~~~~~~~~~~~~~~~~~####
+####~GLM analysis of DM~~~~~####
+###~~fit GLM (morphxlandmark)~~~~~~~~~~~~~~~~~####
 # Create the design matrix
 design <- model.matrix(~ 0 + group, data = y$samples)
 colnames(design) <- levels(factor(make.names(y$samples$group)))
@@ -91,29 +85,18 @@ counts_matrix <- as.matrix(y$counts)
 
 # Estimate the correlation between duplicate measurements
 corfit <- duplicateCorrelation(counts_matrix, design, block = y$samples$Individual)
+
 # Fit the GLM with the estimated correlation
 fit = glmQLFit(y, design, correlation = corfit$consensus)
 
-###~~compare groups (skin)~~~~~~~~~~####
+###~~compare groups (morph.landmark)~~~~~~~~~~####
 my.contrasts = makeContrasts(
-  YelvStri= Yellow-Striped, #compare yellow skin vs black
-  YelvBroM = Yellow-Brown,#compare yellow vs brown
-  BrovStri = Brown-Striped, #compare brown vs black
+  Stri_dorvStri_lat = Striped_dor-Striped_lat,
   levels = design)
-qlf.YelvStri = glmQLFTest(fit, contrast=my.contrasts[,"YelvStri"])
-qlf.YelvBroM = glmQLFTest(fit, contrast=my.contrasts[,"YelvBroM"])
-qlf.BrovStri = glmQLFTest(fit, contrast=my.contrasts[,"BrovStri"])
-
-###~~get DGE results (skin)~~~~~~~~~####
-res.YelvStri = topTags(qlf.YelvStri , n=nrow(y), sort.by = "PValue")
-res.YelvBroM = topTags(qlf.YelvBroM, n=nrow(y), sort.by = "PValue")
-res.BrovStri = topTags(qlf.BrovStri, n=nrow(y), sort.by = "PValue")
-
-##~~~write out DGE tables (skin)~~~~####
-write.csv(res.YelvStri, "results_YelvStri.csv")
-write.csv(res.YelvBroM, "results_YelvBroM.csv")
-write.csv(res.BrovStri, "results_BrovStri.csv")
-
+qlf.Stri_dorvStri_lat = glmQLFTest(fit, contrast=my.contrasts[,"Stri_dorvStri_lat"])
+###~~get DGE results (Morph,landmark)~~~~~~~~~####
+res.Stri_dorvStri_lat = topTags(qlf.Stri_dorvStri_lat, n=nrow(y), sort.by = "PValue")
+##~~~write out DGE tables (morph.landmark~~~~####
+write.csv(res.Stri_dorvStri_lat, "results_Stri_dorvStri_lat.csv")
 ####~fin~~~~~~~~~~~~~~~~~~~~~####
 closeAllConnections()
-

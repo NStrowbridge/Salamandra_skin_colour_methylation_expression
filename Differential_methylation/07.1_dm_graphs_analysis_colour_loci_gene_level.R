@@ -1,3 +1,7 @@
+# Volcano plots and boxplots for differential expression analysis
+# by Nic
+# for analysis of DGE and DGM in yellow, brown and black skin
+
 ####~~~~load libraries~~~~####
 library(rstudioapi)
 library(ggplot2)

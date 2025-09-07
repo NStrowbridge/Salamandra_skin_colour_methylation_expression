@@ -1,6 +1,6 @@
 #DGE analyses script
 # by NS
-#intended for use with output from 04_edgeR_methylation_transcript_level_RNA002 script
+#intended for use with output from 04_edgeR_methylation_transcript_level script
 
 ####~load libraries~~~~~~~~~~####
 library(rstudioapi)
@@ -16,23 +16,17 @@ setwd("/Users/nicstrowbridge/Desktop/Nic_PhD_files_2/DirectRNA_Colour_bernardezi
 count = 00
 
 ###~~output dir~~~~~~~~~~~~~~####
-output = "../06_dm_analysis_skin_transcript_level_RNA002/"
+output = "../06_dm_analysis_skin_transcript_level_colour/"
 dir.create(output) #make folder for output
 setwd(output)
 
 ###~~specify data~~~~~~~~~~~~####
-ss_file="../02_reference_data/filtered_sample_sheet_RNA002.csv" #sample sheet
+ss_file="../02_reference_data/sample_sheet.csv" #sample sheet
 #fa_file="../02_reference_data/functional_annotation.csv" #load eggnog mappings
-em_file="../04_edgeR_methylation_transcript_level_RNA002/cpm_skin.csv" #methylation matrix with CPM
-de_file_start="../04_edgeR_methylation_transcript_level_RNA002/results_" #differential methylation output from edgeR
+em_file="../04_edgeR_methylation_transcript_level/cpm_skin.csv" #methylation matrix with CPM
+de_file_start="../04_edgeR_methylation_transcript_level/results_" #differential methylation output from edgeR
 analyses = c("BrovBla", "YelvBro", "YelvBla")
-custom_colors <- c("Yellow" = "yellow", "Black" = "grey", "Brown" = "brown")
-
-###~~logfile~~~~~~~~~~~~~~~~~####
-#log_file=file(paste("05_dge_analysis_",Sys.Date(),".log",sep=""))
-#sink(log_file,append=TRUE,type="output")
-#sink(log_file,append=TRUE,type="message")
-#Sys.time()
+custom_colors <- c("Yellow" = "yellow", "Black" = "black", "Brown" = "brown")
 
 ####~big loop~~~~~~~~~~~~~~~~####
 for (analysis in analyses) {
@@ -71,6 +65,7 @@ master=merge(em,de,by.x=0,by.y=0) #combine DGE results with CPM to make master
 names(master)[1]="SYMBOL"
 master$mean=rowMeans(master[,2:(nrow(ss)+1)])
 master$mlog10p=-log10(master$PValue)
+master$mlog10FDR=-log10(master$FDR)
 master$sig=as.factor(master$PValue<0.05&abs(master$logFC)>1.0)
 master$sigFDR=as.factor(master$FDR<0.1&abs(master$logFC)>1.0)
 row.names(master)=master[,"SYMBOL"]
@@ -143,10 +138,10 @@ master$direction=factor(master$direction,levels=c("up","down","ns"))
 ##~~~write out masters~~~~~~~####
 write.csv(master, file = "master.csv")
 write.csv(master_sig, file = "sig.csv")
-write.csv(master_fdr, file = "genes_sig_fdr.txt")
+write.csv(master_fdr, file = "sig_fdr.csv")
 write.csv(master_fdr_non_sig, file = "non_sig_fdr.csv")
-write.csv(master_fdr_up, file = "genes_fdr_up.txt")
-write.csv(master_fdr_down, file = "genes_fdr_down.txt")
+write.csv(master_fdr_up, file = "fdr_up.csv")
+write.csv(master_fdr_down, file = "fdr_down.csv")
 write.csv(master_sig_up, file = "sig_up.csv")
 write.csv(master_sig_down, file = "sig_down.csv")
 
@@ -180,6 +175,12 @@ genes_sig_down = row.names(master_sig_down)
 write(genes_sig_down, "genes_sig_down.txt")
 genes_sig_fdr = row.names(master_fdr)
 write(genes_sig_fdr, "genes_sig_fdr.txt")
+genes_fdr_up = row.names(master_fdr_up)
+write(genes_fdr_up, "genes_fdr_up.txt")
+genes_fdr_down = row.names(master_fdr_down)
+write(genes_fdr_down, "genes_fdr_down.txt")
+
+
 
 ####~theme~~~~~~~~~~~~~~~~~~~####
 
@@ -196,7 +197,7 @@ ns_theme=theme(
 ####Prepare data for venn diagram
 fdr_threshold <- 0.10
 fdr.degs <- row.names(master_fdr[which(master_fdr$FDR <= fdr_threshold), ])
-write(fdr.degs, "fdr_degs.txt")
+write(fdr.degs, "fdr_degs.csv")
 
 ###~~MA~~~~~~~~~~~~~~~~~~~~~~####
 ma_plot=ggplot(master,aes(x=log10(mean),y=logFC,colour=direction))+
@@ -211,13 +212,13 @@ ma_plot=ggplot(master,aes(x=log10(mean),y=logFC,colour=direction))+
 ggsave("ma.svg",plot = ma_plot)
 
 ###~~volcano~~~~~~~~~~~~~~~~~####
-volcano_plot=ggplot(master,aes(x=logFC,y=mlog10p,colour=direction))+
+volcano_plot=ggplot(master,aes(x=logFC,y=mlog10FDR,colour=direction))+
   geom_point()+
-  labs(title="Volcano plot",x="Log Fold Change",y="Log P Value")+
+  labs(title="Volcano plot",x="Log Fold Change",y="Log FDR")+
   theme_bw()+
   geom_vline(xintercept=-1,linetype="dashed",colour="grey",size=0.5)+
   geom_vline(xintercept=1,linetype="dashed",colour="grey",size=0.5)+
-  geom_hline(yintercept=-log10(0.05),linetype="dashed",colour="grey")+
+  geom_hline(yintercept=-log10(0.1),linetype="dashed",colour="grey")+
   scale_colour_manual(values=c("red","blue","black"),labels=c("Up","Down","Non-sig"),name="")+
   geom_label_repel(data=top5_sig_up, aes(label=SYMBOL),show.legend=FALSE)+
   geom_label_repel(data=top5_sig_down, aes(label=SYMBOL),show.legend=FALSE)
@@ -280,7 +281,7 @@ top20=master[1:20,]
 candidate_genes=as.vector(row.names(top20)) #get top 20 genes as a vector
 
 #~~~~make gene table~~~~~~~~~####
-gene_data=data.frame(t(em_scaled[candidate_genes,]))
+gene_data=data.frame(t(log2(em[candidate_genes,])))
 gene_data$sample_group=ss$Condition
 gene_data.m=melt(gene_data,id.vars = "sample_group")
 
@@ -434,40 +435,4 @@ ggsave("faceted_20down.svg", plot = boxplot)
 setwd("..")
 }
 
-##~~~PMEL~~~~~~~~~~~~~~~~~~####
-PMEL=master["rb_78195",]
-candidate_genes=as.vector(row.names(PMEL)) #get top 10 genes as a vector
-
-#~~~~make gene table for PMEL~~~~~~~~~####
-gene_data=data.frame(t(em_scaled[candidate_genes,]))
-gene_data$sample_group=ss$Condition
-gene_data.m=melt(gene_data,id.vars = "sample_group")
-
-#~~~~make boxplot of PMEL~~~~~~~~~~~~####
-boxplot_candidate_genes=ggplot(gene_data.m,aes(x=variable,y=value,fill=sample_group))+ 
-  geom_boxplot(outlier.size=0,show.legend=TRUE)+
-  theme_classic()+
-  scale_fill_manual(values=c("grey3", "brown4", "yellow3")) +
-  theme(axis.text.x=element_text(angle=45,hjust=1))#must be placed after all other theme, rotates x axis text
-ggsave("boxplot_PMEL.svg", boxplot_candidate_genes)
-
-##~~~GPNMB~~~~~~~~~~~~~~~~~~####
-GPNMB=master["rb_27044",]
-candidate_genes=as.vector(row.names(GPNMB)) #get top 10 genes as a vector
-
-#~~~~make gene table for GPNMB~~~~~~~~~####
-gene_data=data.frame(t(em_scaled[candidate_genes,]))
-gene_data$sample_group=ss$Condition
-gene_data.m=melt(gene_data,id.vars = "sample_group")
-
-#~~~~make boxplot of GPNMB~~~~~~~~~~~~####
-boxplot_candidate_genes=ggplot(gene_data.m,aes(x=variable,y=value,fill=sample_group))+ 
-  geom_boxplot(outlier.size=0,show.legend=TRUE)+
-  theme_classic()+
-  scale_fill_manual(values=c("grey3", "brown4", "yellow3")) +
-  theme(axis.text.x=element_text(angle=45,hjust=1))#must be placed after all other theme, rotates x axis text
-ggsave("boxplot_GPNMB.svg", boxplot_candidate_genes)
-
-####~end of script~~~~~~~~~~~####
-closeAllConnections()
-
+close.connection()
