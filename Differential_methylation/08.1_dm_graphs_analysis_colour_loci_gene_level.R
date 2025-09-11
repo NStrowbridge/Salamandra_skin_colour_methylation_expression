@@ -37,7 +37,7 @@ create_volcano_plot <- function(data, genes_to_label, gene_name_mapping, title) 
     geom_label_repel(
       data = subset(data, rownames(data) %in% genes_to_label),
       aes(label = gene_label),
-      size = 3,
+      size = 5,
       box.padding = 0.5,
       point.padding = 0.5,
       segment.color = "gray50",
@@ -50,7 +50,7 @@ create_volcano_plot <- function(data, genes_to_label, gene_name_mapping, title) 
     ) +
     labs(title = title, x = "Log2 Fold Change", y = "-Log10 P-value") +
     coord_cartesian(xlim = c(-10, 10), ylim = c(0, 7.5)) +
-    theme_minimal(base_size = 14) +
+    theme_minimal(base_size = 20) +
     theme(
       panel.grid = element_blank(),
       plot.title = element_text(hjust = 0.5, face = "bold"),
@@ -89,7 +89,7 @@ legend_plot <- ggplot(yelvbla, aes(x = logFC, y = mlog10FDR, colour = direction)
     name = NULL
   ) +
   theme_void() +
-  theme(legend.position = "right")
+  theme(legend.position = "right", legend.text = element_text(size = 18))
 
 # Extract legend
 legend <- get_legend(legend_plot)
@@ -135,7 +135,7 @@ create_boxplot <- function(methylation_data, sample_sheet, gene_ids, gene_name_m
   p <- ggplot(gene_data_filtered.m, aes(x = variable, y = value, fill = sample_group)) +
     geom_boxplot(outlier.size = 0) +
     theme_classic() +
-    theme(axis.text.x = element_text(angle = 45, hjust = 1), text = element_text(size = 16)) +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1), text = element_text(size = 20)) +
     labs(title = title, y = "log2(Methylation + 1)", x = "Gene") +
     scale_fill_manual(values = color_mapping, drop = FALSE) +
     ylim(0,10)
@@ -190,7 +190,7 @@ dummy_plot <- ggplot(
     name = "Skin colour"
   ) +
   theme_void() +
-  theme(legend.position = "right")
+  theme(legend.position = "right", legend.text = element_text(size = 16), legend.title = element_text(size = 18))
 
 
 # Extract the legend
@@ -259,7 +259,7 @@ final_labeled <- ggdraw(final_layout) +
   )
 
 # Save the final figure
-ggsave("final_combined_figure_with_legends_labeled.svg", final_labeled, width = 16, height = 10)
+ggsave("final_combined_figure_with_legends_labeled.svg", final_labeled, width = 17, height = 10)
 
 ####~~~~Supplemental boxplots for all pigment genes~~~~####
 
