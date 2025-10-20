@@ -21,9 +21,10 @@ conda activate salmon
 # Run salmon quant
 
 for ana in "${array[@]}";do
-  mkdir /path/and/name/of/directory/for/results
-  cd /path/to/created/directory
-  salmon quant -t ${REFERENCE} -l A -a "${DIRECTORY}/${ana}/${ana}_kmer19_transcriptome_aln.sam" -o salmon_quant -p 48 --ont
+  cd "${DIRECTORY}"
+  mkdir salmon_quant
+  cd salmon_quant
+  salmon quant -t ${REFERENCE} -l A -a "${DIRECTORY}/${ana}/${ana}_kmer19_transcriptome_aln.sam" -o ${ana}_salmon_quant -p 48 --ont
 done
 
 # Activate samtools environment
