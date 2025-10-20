@@ -22,7 +22,7 @@ conda install -y slow5tools ont_vbz_hdf_plugin
 
 # Define base directory for RNA002 DirectRNA data
 BASE_DIR="Base_directory"
-SAMPLES=("NS7_lat" "NS7_dor" "NS1_lat" "NS2_lat" "NS2_dor" "NS3_lat" "NS3_dor" "NS5_lat" "NS5_dor" "NS8_lat" "NS8_dor" "NS10_lat" "NS10_dor")
+SAMPLES=("NS7_lat" "NS7_dor" "NS2_lat" "NS2_dor" "NS3_lat" "NS3_dor" "NS5_lat" "NS5_dor" "NS8_lat" "NS8_dor" "NS10_lat" "NS10_dor")
 
 # Run slow5tools conversion and merge
 for ana in "${SAMPLES[@]}"; do
