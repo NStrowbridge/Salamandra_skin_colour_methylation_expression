@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # Activate Dorado basecalling environment
-source ~/miniconda3/etc/profile.d/conda.sh
 conda activate dorado_basecalling
 
 # Define paths and filenames

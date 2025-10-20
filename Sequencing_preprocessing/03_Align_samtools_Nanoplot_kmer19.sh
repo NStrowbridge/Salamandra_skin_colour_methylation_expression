@@ -1,17 +1,11 @@
 #!/bin/bash
 
 # Define base directory and reference transcriptome
-BASE_DIR="/export/home4/2694872s/DirectRNA"
-REFERENCE="${BASE_DIR}/NS9/pychopper_NS9_dorado_qscore9_output/NS9_dorado_qscore9_trimmed_reads_kraken_conf0.9_rRNA/RNAbloom_assembly_qscore9_pychopper_kraken2_rRNAremoved_k19/rnabloom.transcripts.fa"
+BASE_DIR="base_directory"
+REFERENCE="${BASE_DIR}/reference_file"
 
 # List of sample identifiers
-SAMPLES=(
-  "NS2_dor" "NS2_lat" "NS3_dor" "NS3_lat" "NS5_dor" "NS5_lat"
-  "NS7_dor" "NS7_lat" "NS8_dor" "NS8_lat" "NS10_dor" "NS10_lat"
-  "NS11_dor" "NS11_lat" "NS12_dor" "NS12_lat"
-  "ELT_14079_dor" "ELT_14079_lat" "ELT_14081_dor" "ELT_14081_lat"
-  "ELT_14082_dor" "ELT_14082_lat" "ELT_14084_dor" "ELT_14084_lat"
-)
+SAMPLES=()
 
 # Activate minimap2 environment and align reads
 conda activate minimap2
