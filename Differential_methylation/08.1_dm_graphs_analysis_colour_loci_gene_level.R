@@ -9,6 +9,7 @@ library(ggrepel)
 #BiocManager::install("amap")
 library(amap)
 library(reshape2)
+library(cowplot)
 
 ####~~~~housekeeping~~~~####
 
@@ -85,20 +86,21 @@ legend_plot <- ggplot(yelvbla, aes(x = logFC, y = mlog10FDR, colour = direction)
   geom_point() +
   scale_colour_manual(
     values = c("down" = "blue3", "ns" = "black", "up" = "red3"),
-    labels = c("Downregulated", "Not Significant", "Upregulated"),
+    labels = c("Hypomethylated", "Not Significant", "Hypermethylated"),
     name = NULL
   ) +
   theme_void() +
   theme(legend.position = "right", legend.text = element_text(size = 18))
 
-# Extract legend
+# Extract the legend
 legend <- get_legend(legend_plot)
 
-# Combine plots with shared legend
-combined_plot <- (plot1 + plot2 + plot3) + plot_layout(guides = "collect") & theme(legend.position = "right")
+combined <- plot_grid( plot1, plot2, plot3, ncol = 3, align = "hv" ) 
+
+final_plot <- plot_grid( combined, legend, ncol = 2, rel_widths = c(3, 0.5) )
 
 # Save
-ggsave("combined_volcano_with_shared_legend.svg", combined_plot, width = 20, height = 6)
+ggsave("combined_volcano_with_shared_legend.svg", final_plot, width = 20, height = 6)
 
 
 ####~~~~make combined differential methylation boxplots~~~~####
@@ -196,11 +198,9 @@ dummy_plot <- ggplot(
 # Extract the legend
 legend <- get_legend(dummy_plot)
 
-# Combine plots with shared legend
-combined_boxplot <- (plot1 | plot2 | plot3) + plot_layout(guides = "collect") & theme(legend.position = "none")
+combined <- plot_grid( plot1, plot2, plot3, ncol = 3, align = "hv" ) 
 
-# Add the legend to the combined plot
-final_plot <- plot_grid(combined_boxplot, legend, ncol = 2, rel_widths = c(3, 0.5))
+final_plot <- plot_grid( combined, legend, ncol = 2, rel_widths = c(3, 0.5) )
 
 # Save the final plot
 ggsave("combined_boxplot_with_single_legend.svg", final_plot, width = 20, height = 6)
@@ -243,7 +243,7 @@ combined_legend <- plot_grid(volcano_legend, boxplot_legend, ncol = 1)
 
 # Final layout with wider left column for Venn
 final_layout <- plot_grid(
-  plot_grid(right_column, combined_legend, ncol = 2, rel_widths = c(3, 0.4)),
+  plot_grid(right_column, combined_legend, ncol = 2, rel_widths = c(2.5, 0.4)),
   ncol = 1,
   rel_widths = c(1.4, 3) 
 )
@@ -343,5 +343,5 @@ legend_dummy <- ggplot(
   theme(legend.position = "right")
 
 legend_all <- get_legend(legend_dummy)
-boxplot_all_with_legend <- plot_grid(boxplot_all + theme(legend.position = "none"), legend_all, ncol = 2, rel_widths = c(3, 0.5))
-ggsave("combined_all_colours_boxplot.svg", boxplot_all_with_legend, width = 12, height = 6)
+boxplot_all_with_legend <- plot_grid(boxplot_all + theme(legend.position = "none"), legend_all, ncol = 2, rel_widths = c(3.5, 0.5))
+ggsave("combined_all_colours_boxplot.svg", boxplot_all_with_legend, width = 13, height = 6)

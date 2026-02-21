@@ -9,19 +9,18 @@ library(dplyr)
 
 ####~housekeeping~~~~~~~~~~~~####
 rm(list=ls()) #clear the environment
-setwd("/Users/nicstrowbridge/Desktop/Nic_PhD_files_2/DirectRNA_Colour_bernardezi/Differential_methylation/02_reference_data") #set wd to reference data folder
-
-###~~logfile~~~~~~~~~~~~~~~~~####
-#log_file=file(paste("02_get_functional_annotation_",Sys.Date(),".log",sep=""))
-#sink(log_file,append=TRUE,type="output")
-#sink(log_file,append=TRUE,type="message")
-#Sys.time()
+setwd("/Users/nicstrowbridge/Desktop/Nic_PhD_files_2/DirectRNA_Colour_bernardezi/Differential_expression/02_reference_data") #set wd to reference data folder
 
 ####~get eggnogg annotation~~####
 #transdecoder
 eggnog_transdecoder = read_excel("eggnogmapper_diamond_output_transdecoder_kmer19_transcriptID.emapper.annotations.xlsx", skip = 4)
 eggnog_transdecoder = eggnog_transdecoder[-c(19103,19104,19105),] #delete empty rows and header row
 colnames(eggnog_transdecoder)[1] = "query"
+eggnog_transdecoder <- eggnog_transdecoder %>%
+  group_by(Transcript_ID) %>%
+  slice_max(score, n = 1) %>%
+  ungroup()
+
 #rnasamba
 eggnog_rnasamba <- read.delim("eggnogmapper_diamond_output_rnasamba_kmer19.emapper.annotations.tsv", skip = 4)
 eggnog_rnasamba = eggnog_rnasamba[-c(18948,18949,18950),] #delete empty rows and header row
@@ -68,13 +67,13 @@ final_annotated_transcripts <- function(merged_df) {
   final_df <- merged_df %>%
     mutate(
       seed_ortholog = ifelse(!is.na(seed_ortholog_transdecoder) & !is.na(seed_ortholog_rnasamba), 
-                             ifelse(score_transdecoder <= score_rnasamba, seed_ortholog_transdecoder, seed_ortholog_rnasamba),
+                             ifelse(score_transdecoder >= score_rnasamba, seed_ortholog_transdecoder, seed_ortholog_rnasamba),
                              coalesce(seed_ortholog_transdecoder, seed_ortholog_rnasamba)),
       Preferred_name = ifelse(!is.na(Preferred_name_transdecoder) & !is.na(Preferred_name_rnasamba), 
-                              ifelse(score_transdecoder <= score_rnasamba, Preferred_name_transdecoder, Preferred_name_rnasamba),
+                              ifelse(score_transdecoder >= score_rnasamba, Preferred_name_transdecoder, Preferred_name_rnasamba),
                               coalesce(Preferred_name_transdecoder, Preferred_name_rnasamba)),
       GOs = ifelse(!is.na(GOs_transdecoder) & !is.na(GOs_rnasamba), 
-                   ifelse(score_transdecoder <= score_rnasamba, GOs_transdecoder, GOs_rnasamba),
+                   ifelse(score_transdecoder >= score_rnasamba, GOs_transdecoder, GOs_rnasamba),
                    coalesce(GOs_transdecoder, GOs_rnasamba))
     ) %>%
     dplyr::select(Transcript_ID, seed_ortholog, Preferred_name, GOs) %>%
@@ -91,8 +90,7 @@ duplicates <- final_result %>% filter(duplicated(Transcript_ID))
 print("\nDuplicates in Transcript_ID column:")
 print(duplicates)
 
-transcriptome_annotaton_combined_RNAsamba_Transdecoder <- final_result %>%
-  distinct(seed_ortholog, Preferred_name, .keep_all = TRUE)
+transcriptome_annotaton_combined_RNAsamba_Transdecoder <- final_result %>% distinct(Transcript_ID, .keep_all = TRUE)
 
 transcriptome_annotaton_combined_RNAsamba_Transdecoder_dups <- transcriptome_annotaton_combined_RNAsamba_Transdecoder %>% filter(duplicated(Transcript_ID))
 print("\nDuplicates in Transcript_ID column:")
@@ -100,7 +98,7 @@ print(transcriptome_annotaton_combined_RNAsamba_Transdecoder)
 
 ###~~make txname*geneid~~~~~~~~~~####
 # Rename seed_ortholog to gene name
-transcriptome_annotaton_combined_RNAsamba_Transdecoder <- transcriptome_annotaton_combined_RNAsamba_Transdecoder %>% rename("seed_ortholog" = "GENEID")
+transcriptome_annotaton_combined_RNAsamba_Transdecoder <- transcriptome_annotaton_combined_RNAsamba_Transdecoder %>% rename("GENEID" = "seed_ortholog")
 print(head(transcriptome_annotaton_combined_RNAsamba_Transdecoder))
 txname_geneid = transcriptome_annotaton_combined_RNAsamba_Transdecoder[,c("Transcript_ID","GENEID")]
 
@@ -119,5 +117,6 @@ write.csv(txname_Preferredname, file = "../02_reference_data/txname_Preferrednam
 write_tsv(gene2GO, file = "../02_reference_data/gene2GO.map", col_names = FALSE)
 
 ####~fin~~~~~~~~~~~~~~~~~~~~~####
+
 closeAllConnections()
 
