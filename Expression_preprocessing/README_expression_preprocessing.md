@@ -1,4 +1,4 @@
-The following provides a concise overview of each analysis script for expression pre-processing, including its purpose and software versions.
+The following provides a concise overview of each analysis script for pre-processing the expression data, including its purpose and software versions.
 
 **01_Align_count_samtools_Nanoplot_kmer19.sh**
 
