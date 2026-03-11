@@ -1,2 +1,11 @@
+The following provides a concise overview of each analysis script for sequencing pre-processing, including its purpose and software versions.
 
-Project investigating molecular mechanisms of colouration in Salamandra salamandra bernardezi. We used different colours, striped, yellow and brown morphs, to investigate whether molecular modifications such as alternative splicing and methylation play a role in colouration differences. In order to investigate this, we used Direct RNA sequencing using the Oxford Nanopore sequencing platform.
+**01_fast5_to_pod5.sh**
+
+Description: A script converts raw output files from Nanopore (fast5) to pod5 files for quick computation.
+Packages: Pod5 0.3.23
+
+**02_dorado_basecalling_0.7.2.sh**
+
+Description: A script that basecalls the raw Nanopore directRNA files.
+Packages: Dorado 0.7.2
