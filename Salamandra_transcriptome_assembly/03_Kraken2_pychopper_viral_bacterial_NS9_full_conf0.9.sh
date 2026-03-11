@@ -5,9 +5,9 @@ source ~/miniconda3/etc/profile.d/conda.sh
 conda activate kraken2
 
 # Define paths and filenames
-base_dir="/export/home4/2694872s/DirectRNA/NS9/pychopper_NS9_dorado_qscore9_output"
-input_file="NS9_dorado_qscore9_pychopper_full.fq"
-kraken_db="/export/home4/2694872s/DirectRNA/kraken2_db/kraken2_db"
+base_dir="base_dir"
+input_file="input_fastq"
+kraken_db="Kraken2_db_directory"
 threads=32
 confidence=0.90
 

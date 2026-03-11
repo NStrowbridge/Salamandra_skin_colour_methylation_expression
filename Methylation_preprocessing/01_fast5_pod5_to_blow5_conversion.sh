@@ -4,10 +4,10 @@
 source ./blue-crab-venv/bin/activate
 
 # Define base directory for RNA004 DirectRNA data
-BASE_DIR="Base_directory"
+BASE_DIR="Base_dir"
 
 # Define sample identifiers
-SAMPLES=("ELT14079_dor" "ELT14081_lat" "ELT14081_dor" "ELT14082_lat" "ELT14082_dor" "ELT14084_lat" "ELT14084_dor" "NS12_lat" "NS12_dor" "NS11_lat" "NS11_dor")
+SAMPLES=()
 
 # Run blue-crab conversion
 for ana in "${SAMPLES[@]}"; do
@@ -22,7 +22,7 @@ conda install -y slow5tools ont_vbz_hdf_plugin
 
 # Define base directory for RNA002 DirectRNA data
 BASE_DIR="Base_directory"
-SAMPLES=("NS7_lat" "NS7_dor" "NS2_lat" "NS2_dor" "NS3_lat" "NS3_dor" "NS5_lat" "NS5_dor" "NS8_lat" "NS8_dor" "NS10_lat" "NS10_dor")
+SAMPLES=()
 
 # Run slow5tools conversion and merge
 for ana in "${SAMPLES[@]}"; do

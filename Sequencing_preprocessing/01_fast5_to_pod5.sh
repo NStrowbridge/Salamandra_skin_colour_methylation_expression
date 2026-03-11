@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define paths
-BASE_DIR="/export/home4/2694872s/DirectRNA/sample_folder" #Change depending on sample
+BASE_DIR="base_dir" #Change depending on sample
 
 # activate conda environment with pod5
 conda activate pod5_conversion

@@ -1,9 +1,9 @@
 import csv
 
 # Define input and output files
-transcript_names_file = "/Users/nicstrowbridge/Desktop/Nic_PhD_files_2/DirectRNA_Colour_bernardezi/Differential_expression/06_dge_analysis_skin_colour/01_BrovBla/genes_sig_fdr.txt"
-preferred_name_file = "/Users/nicstrowbridge/Desktop/Nic_PhD_files_2/DirectRNA_Colour_bernardezi/Differential_expression/06_dge_analysis_skin_colour/01_BrovBla/preferredname_genes_sig_fdr.csv"
-output_file = "/Users/nicstrowbridge/Desktop/Nic_PhD_files_2/DirectRNA_Colour_bernardezi/Differential_expression/06_dge_analysis_skin_colour/BrovBla_missing_genes_sigFDR.fa"
+transcript_names_file = "/DirectRNA_Colour_bernardezi/Differential_methylation/06_dm_analysis_skin_transcript_level/03_YelvBla/genes_sig_fdr.txt"
+preferred_name_file = "/DirectRNA_Colour_bernardezi/Differential_methylation/06_dm_analysis_skin_transcript_level/03_YelvBla/preferredname_genes_sig_fdr.csv"
+output_file = "/DirectRNA_Colour_bernardezi/Differential_methylation/06_dm_analysis_skin_transcript_level/YelvBla_missing_genes_sigFDR.fa"
 
 def compare_transcripts(transcript_file, csv_file, output_file):
     # Read the transcript names from the text file

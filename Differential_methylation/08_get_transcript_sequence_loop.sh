@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Change to the directory containing the transcript name files
-cd /Users/nicstrowbridge/Desktop/Nic_PhD_files_2/Code || exit
+cd /Code || exit
 
 # Define input and output files
 transcript_names_files=(
@@ -11,11 +11,11 @@ transcript_names_files=(
   unique_transcripts_split_part_10.txt unique_transcripts_split_part_11.txt unique_transcripts_split_part_12.txt unique_transcripts_split_part_13.txt
 )
 
-transcriptome_file="/Users/nicstrowbridge/Desktop/Nic_PhD_files_2/DirectRNA_Colour_bernardezi/NS9_transcriptome/rnabloom_transcriptome_kmer19.fasta"
+transcriptome_file="/DirectRNA_Colour_bernardezi/NS9_transcriptome/rnabloom_transcriptome_kmer19.fasta"
 
 # Process each transcript name file
 for ana in "${transcript_names_files[@]}"; do
-  output_file="/Users/nicstrowbridge/Desktop/Nic_PhD_files_2/DirectRNA_Colour_bernardezi/${ana}.fa"
+  output_file="/DirectRNA_Colour_bernardezi/${ana}.fa"
   > "$output_file"  # Clear or create the output file
 
   while IFS= read -r transcript_name; do

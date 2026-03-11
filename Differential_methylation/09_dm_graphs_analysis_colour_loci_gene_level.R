@@ -14,7 +14,7 @@ library(cowplot)
 ####~~~~housekeeping~~~~####
 
 rm(list=ls()) #clear the environment
-setwd("/Users/nicstrowbridge/Desktop/Nic_PhD_files_2/DirectRNA_Colour_bernardezi/Differential_methylation/01_scripts") #set wd
+setwd("script_folder") #set wd
 
 ####~~~~output dir~~~~####
 output = "../05.2_dm_graphs_analysis_colour_loci_gene_level/"
@@ -61,9 +61,9 @@ create_volcano_plot <- function(data, genes_to_label, gene_name_mapping, title) 
 
 
 # Load your data
-yelvbla <- read.csv("/Users/nicstrowbridge/Desktop/Nic_PhD_files_2/DirectRNA_Colour_bernardezi/Differential_methylation/06_dm_analysis_skin_transcript_level/03_YelvBla/master.csv", row.names = 1)
-brovbla <- read.csv("/Users/nicstrowbridge/Desktop/Nic_PhD_files_2/DirectRNA_Colour_bernardezi/Differential_methylation/06_dm_analysis_skin_transcript_level/01_BrovBla/master.csv", row.names = 1)
-yelvbro <- read.csv("/Users/nicstrowbridge/Desktop/Nic_PhD_files_2/DirectRNA_Colour_bernardezi/Differential_methylation/06_dm_analysis_skin_transcript_level_morph/02_YelvBroM/master.csv", row.names = 1)
+yelvbla <- read.csv("/DirectRNA_Colour_bernardezi/Differential_methylation/06_dm_analysis_skin_transcript_level/03_YelvBla/master.csv", row.names = 1)
+brovbla <- read.csv("/DirectRNA_Colour_bernardezi/Differential_methylation/06_dm_analysis_skin_transcript_level/01_BrovBla/master.csv", row.names = 1)
+yelvbro <- read.csv("/DirectRNA_Colour_bernardezi/Differential_methylation/06_dm_analysis_skin_transcript_level_morph/02_YelvBroM/master.csv", row.names = 1)
 
 # Define genes and mappings
 
@@ -147,13 +147,13 @@ create_boxplot <- function(methylation_data, sample_sheet, gene_ids, gene_name_m
 
 # Load sample sheet
 
-ss <- read.csv("/Users/nicstrowbridge/Desktop/Nic_PhD_files_2/DirectRNA_Colour_bernardezi/Differential_methylation/02_reference_data/sample_sheet.csv")
+ss <- read.csv("/DirectRNA_Colour_bernardezi/Differential_methylation/02_reference_data/sample_sheet.csv")
 
 # Load DM data
 
-yelvbla <- read.csv("/Users/nicstrowbridge/Desktop/Nic_PhD_files_2/DirectRNA_Colour_bernardezi/Differential_methylation/06_dm_analysis_skin_transcript_level/03_YelvBla/master.csv", row.names = 1)
-brovbla <- read.csv("/Users/nicstrowbridge/Desktop/Nic_PhD_files_2/DirectRNA_Colour_bernardezi/Differential_methylation/06_dm_analysis_skin_transcript_level/01_BrovBla/master.csv", row.names = 1)
-yelvbro <- read.csv("/Users/nicstrowbridge/Desktop/Nic_PhD_files_2/DirectRNA_Colour_bernardezi/Differential_methylation/06_dm_analysis_skin_transcript_level_morph/02_YelvBroM/master.csv", row.names = 1)
+yelvbla <- read.csv("/DirectRNA_Colour_bernardezi/Differential_methylation/06_dm_analysis_skin_transcript_level/03_YelvBla/master.csv", row.names = 1)
+brovbla <- read.csv("/DirectRNA_Colour_bernardezi/Differential_methylation/06_dm_analysis_skin_transcript_level/01_BrovBla/master.csv", row.names = 1)
+yelvbro <- read.csv("/DirectRNA_Colour_bernardezi/Differential_methylation/06_dm_analysis_skin_transcript_level_morph/02_YelvBroM/master.csv", row.names = 1)
 
 # Define genes and mappings
 

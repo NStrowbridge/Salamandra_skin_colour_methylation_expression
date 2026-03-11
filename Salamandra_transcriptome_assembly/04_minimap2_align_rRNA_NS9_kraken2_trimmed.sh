@@ -4,10 +4,10 @@
 conda activate minimap2
 
 # Define paths
-BASE_DIR="/export/home4/2694872s/DirectRNA/NS9/pychopper_NS9_dorado_qscore9_output"
-READS="NS9_dorado_qscore9_trimmed_reads_kraken_conf0.9.fastq"
-RRNA_DB="/export/home4/2694872s/DirectRNA/rRNA_databases_v4/smr_v4.3_default_db.fasta"
-OUTPUT_DIR="NS9_dorado_qscore9_trimmed_reads_kraken_conf0.9_rRNA"
+BASE_DIR="base_directory_with_fastq"
+READS="input_reads_trimmed_from_kraken2"
+RRNA_DB="rRNA_db_directory/rRNA_fasta_file"
+OUTPUT_DIR="output_directory"
 NON_RRNA_READS="${OUTPUT_DIR}/non_rrna_reads.fastq"
 RRNA_READS="${OUTPUT_DIR}/rrna_reads.sam"
 

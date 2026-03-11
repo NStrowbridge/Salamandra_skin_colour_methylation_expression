@@ -7,7 +7,7 @@ library(stringr)
 
 ####~housekeeping~~~~~~~~~~~~####
 rm(list = ls()) # clear the environment
-setwd("/Users/nicstrowbridge/Desktop/Nic_PhD_files_2/DirectRNA_Colour_bernardezi/Differential_expression/01_scripts") # set wd
+setwd("script_folder") # set wd
 
 ###~~output dir~~~~~~~~~~~~~~####
 output = "../05.2_dge_graphs_analysis_colour_loci_gene_level/"
@@ -17,28 +17,28 @@ setwd(output)
 ####~~~load data~~~####
 
 # Load methylation data
-meth_yelvbla <- read.csv("/Users/nicstrowbridge/Desktop/Nic_PhD_files_2/DirectRNA_Colour_bernardezi/Differential_methylation/02_reference_data/YelvBla_DM_anno.csv")
+meth_yelvbla <- read.csv("/DirectRNA_Colour_bernardezi/Differential_methylation/02_reference_data/YelvBla_DM_anno.csv")
 colnames(meth_yelvbla) <- meth_yelvbla[1, ]
 meth_yelvbla <- meth_yelvbla[-1, ]
 
-meth_brovbla <- read.csv("/Users/nicstrowbridge/Desktop/Nic_PhD_files_2/DirectRNA_Colour_bernardezi/Differential_methylation/02_reference_data/BrovBla_DM_anno.csv")
+meth_brovbla <- read.csv("/DirectRNA_Colour_bernardezi/Differential_methylation/02_reference_data/BrovBla_DM_anno.csv")
 colnames(meth_brovbla) <- meth_brovbla[1, ]
 meth_brovbla <- meth_brovbla[-1, ]
 
-meth_yelvbro <- read.csv("/Users/nicstrowbridge/Desktop/Nic_PhD_files_2/DirectRNA_Colour_bernardezi/Differential_methylation/02_reference_data/YelvBroM_DM_anno.csv")
+meth_yelvbro <- read.csv("/DirectRNA_Colour_bernardezi/Differential_methylation/02_reference_data/YelvBroM_DM_anno.csv")
 colnames(meth_yelvbro) <- meth_yelvbro[1, ]
 meth_yelvbro <- meth_yelvbro[-1, ]
 
 # Load expression data
-expr_yelvbla <- read.csv("/Users/nicstrowbridge/Desktop/Nic_PhD_files_2/DirectRNA_Colour_bernardezi/Differential_expression/02_reference_data/YelvBla_DE_anno.csv")
+expr_yelvbla <- read.csv("/DirectRNA_Colour_bernardezi/Differential_expression/02_reference_data/YelvBla_DE_anno.csv")
 colnames(expr_yelvbla) <- expr_yelvbla[1, ]
 expr_yelvbla <- expr_yelvbla[-1, ]
 
-expr_brovbla <- read.csv("/Users/nicstrowbridge/Desktop/Nic_PhD_files_2/DirectRNA_Colour_bernardezi/Differential_expression/02_reference_data/BrovBla_DE_anno.csv")
+expr_brovbla <- read.csv("/DirectRNA_Colour_bernardezi/Differential_expression/02_reference_data/BrovBla_DE_anno.csv")
 colnames(expr_brovbla) <- expr_brovbla[1, ]
 expr_brovbla <- expr_brovbla[-1, ]
 
-expr_yelvbro <- read.csv("/Users/nicstrowbridge/Desktop/Nic_PhD_files_2/DirectRNA_Colour_bernardezi/Differential_expression/02_reference_data/YelvBroM_DE_anno.csv")
+expr_yelvbro <- read.csv("/DirectRNA_Colour_bernardezi/Differential_expression/02_reference_data/YelvBroM_DE_anno.csv")
 colnames(expr_yelvbro) <- expr_yelvbro[1, ]
 expr_yelvbro <- expr_yelvbro[-1, ]
 

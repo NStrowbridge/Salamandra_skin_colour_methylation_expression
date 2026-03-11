@@ -12,7 +12,7 @@ library(purrr)
 ####~housekeeping~~~~~~~~~~~~####
 
 rm(list=ls()) #clear the environment
-setwd("/Users/nicstrowbridge/Desktop/Nic_PhD_files_2/DirectRNA_Colour_bernardezi/Differential_methylation/01_scripts") #set wd
+setwd("script_folder") #set wd
 
 ###~~output dir~~~~~~~~~~~~~~####
 output = "../05.2_dm_graphs_analysis_colour_loci_gene_level/"
@@ -21,14 +21,14 @@ setwd(output)
 
 ####~~~~Scatter plots between methylation and expression~~~~####
 # Load methylation data
-meth_yelvbla <- read.csv("/Users/nicstrowbridge/Desktop/Nic_PhD_files_2/DirectRNA_Colour_bernardezi/Differential_methylation/06_dm_analysis_skin_transcript_level/03_YelvBla/master.csv", row.names = 1)
-meth_brovbla <- read.csv("/Users/nicstrowbridge/Desktop/Nic_PhD_files_2/DirectRNA_Colour_bernardezi/Differential_methylation/06_dm_analysis_skin_transcript_level/01_BrovBla/master.csv", row.names = 1)
-meth_yelvbro <- read.csv("/Users/nicstrowbridge/Desktop/Nic_PhD_files_2/DirectRNA_Colour_bernardezi/Differential_methylation/06_dm_analysis_skin_transcript_level_morph/02_YelvBroM/master.csv", row.names = 1)
+meth_yelvbla <- read.csv("/DirectRNA_Colour_bernardezi/Differential_methylation/06_dm_analysis_skin_transcript_level/03_YelvBla/master.csv", row.names = 1)
+meth_brovbla <- read.csv("/DirectRNA_Colour_bernardezi/Differential_methylation/06_dm_analysis_skin_transcript_level/01_BrovBla/master.csv", row.names = 1)
+meth_yelvbro <- read.csv("/DirectRNA_Colour_bernardezi/Differential_methylation/06_dm_analysis_skin_transcript_level_morph/02_YelvBroM/master.csv", row.names = 1)
 
 # Load expression data
-expr_yelvbla <- read.csv("/Users/nicstrowbridge/Desktop/Nic_PhD_files_2/DirectRNA_Colour_bernardezi/Differential_expression/06_dge_analysis_skin_colour/03_YelvBla/master.csv", row.names = 1)
-expr_brovbla <- read.csv("/Users/nicstrowbridge/Desktop/Nic_PhD_files_2/DirectRNA_Colour_bernardezi/Differential_expression/06_dge_analysis_skin_colour/01_BrovBla/master.csv", row.names = 1)
-expr_yelvbro <- read.csv("/Users/nicstrowbridge/Desktop/Nic_PhD_files_2/DirectRNA_Colour_bernardezi/Differential_expression/06_dge_analysis_skin_morph/02_YelvBroM/master.csv", row.names = 1)
+expr_yelvbla <- read.csv("/DirectRNA_Colour_bernardezi/Differential_expression/06_dge_analysis_skin_colour/03_YelvBla/master.csv", row.names = 1)
+expr_brovbla <- read.csv("/DirectRNA_Colour_bernardezi/Differential_expression/06_dge_analysis_skin_colour/01_BrovBla/master.csv", row.names = 1)
+expr_yelvbro <- read.csv("/DirectRNA_Colour_bernardezi/Differential_expression/06_dge_analysis_skin_morph/02_YelvBroM/master.csv", row.names = 1)
 
 
 genes_yelvbla <- c("rb_77721", "rb_79752", "rb_62964", "rb_92274", "rb_78195", "rb_15163")
@@ -163,8 +163,8 @@ ggsave("combined_facet_scatterplot.svg", p, width = 24, height = 8)
 
 ####~~~~Scatter plot for striped dor vs striped lat comparison~~~~#####
 # Load data
-expr_stridorvstrilat <- read.csv("/Users/nicstrowbridge/Desktop/Nic_PhD_files_2/DirectRNA_Colour_bernardezi/Differential_expression/06_dge_analysis_stridorvstrilat/01_Stri_dorvStri_lat/master.csv", row.names = 1)
-meth_stridorvstrilat <- read.csv("/Users/nicstrowbridge/Desktop/Nic_PhD_files_2/DirectRNA_Colour_bernardezi/Differential_methylation/06_dm_analysis_skin_transcript_level_stridorvstrilat/01_Stri_dorvStri_lat/master.csv", row.names = 1)
+expr_stridorvstrilat <- read.csv("/DirectRNA_Colour_bernardezi/Differential_expression/06_dge_analysis_stridorvstrilat/01_Stri_dorvStri_lat/master.csv", row.names = 1)
+meth_stridorvstrilat <- read.csv("/DirectRNA_Colour_bernardezi/Differential_methylation/06_dm_analysis_skin_transcript_level_stridorvstrilat/01_Stri_dorvStri_lat/master.csv", row.names = 1)
 
 # Define color palette
 category_colors <- c(

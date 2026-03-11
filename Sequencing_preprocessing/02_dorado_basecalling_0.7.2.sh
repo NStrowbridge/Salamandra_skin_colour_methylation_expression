@@ -4,7 +4,7 @@
 conda activate dorado_basecalling  # Ensure this environment is documented
 
 # Define paths and filenames
-project_directory="/export/home4/2694872s/DirectRNA/NS1_lat"
+project_directory="project_dir"
 sample_name="sample_name"
 input_pod5="${project_directory}/${sample_name}_converted.pod5"
 dorado_model_name="rna002_70bps_hac@v3"

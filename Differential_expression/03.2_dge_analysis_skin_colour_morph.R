@@ -13,21 +13,21 @@ library(reshape2)
 ####~housekeeping~~~~~~~~~~~~####
 
 rm(list=ls()) #clear the environment
-setwd("/Users/nicstrowbridge/Desktop/Nic_PhD_files_2/DirectRNA_Colour_bernardezi/Differential_expression/01_scripts") #set wd
+setwd("script_folder") #set wd
 count = 00
 
 ###~~output dir~~~~~~~~~~~~~~####
-output = "../06_dge_analysis_skin_colour/"
+output = "../06_dge_analysis_skin_morph/"
 dir.create(output) #make folder for output
 setwd(output)
 
 ###~~specify data~~~~~~~~~~~~####
-ss_file="~/Desktop/Nic_PhD_files_2/DirectRNA_Colour_bernardezi/Differential_expression/02_reference_data/sample_sheet.csv" #sample sheet
+ss_file="path_to_sample_sheet" #sample sheet
 #fa_file="../02_reference_data/functional_annotation.csv" #load eggnog mappings
-em_file="../04_edge_R_transcript_level_skin_colour/cpm_skin.csv" #expression matrix with CPM
-de_file_start="../04_edge_R_transcript_level_skin_colour/results_" #differential expression output from edgeR
-analyses = c("BrovBla","YelvBro","YelvBla")
-custom_colors <- c("Yellow" = "yellow", "Black" = "grey", "Brown" = "brown")
+em_file="../04_edge_R_transcript_level_skin_morph/cpm_skin.csv" #expression matrix with CPM
+de_file_start="../04_edge_R_transcript_level_skin_morph/results_" #differential expression output from edgeR
+analyses = c("BrovStri","YelvBroM","YelvStri")
+custom_colors <- c("Yellow" = "yellow", "Striped" = "grey", "Brown" = "brown")
 
 ###~~logfile~~~~~~~~~~~~~~~~~####
 #log_file=file(paste("05_dge_analysis_",Sys.Date(),".log",sep=""))
@@ -238,7 +238,7 @@ candidate_genes=as.vector(row.names(top10)) #get top 10 genes as a vector
 
 #~~~~make gene table~~~~~~~~~####
 gene_data=data.frame(t(em_scaled[candidate_genes,]))
-gene_data$sample_group=ss$Condition
+gene_data$sample_group=ss$Morph
 gene_data.m=melt(gene_data,id.vars = "sample_group")
 
 #~~~~make boxplot~~~~~~~~~~~~####

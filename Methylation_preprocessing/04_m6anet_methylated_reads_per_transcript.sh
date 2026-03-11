@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Define directory and samples
-BASE_DIR="/Volumes/LaCie/Nic_DirectRNA_raw_data/m6anet_data"
-SAMPLES=("NS2_dor" "NS2_lat" "NS3_dor" "NS3_lat" "NS5_dor" "NS5_lat" "NS7_dor" "NS7_lat" "NS8_dor" "NS8_lat" "NS10_dor" "NS10_lat" "NS11_dor" "NS11_lat" "NS12_dor" "NS12_lat" "ELT_14079_dor" "ELT_14079_lat" "ELT_14081_dor" "ELT_14081_lat" "ELT_14082_dor" "ELT_14082_lat" "ELT_14084_dor" "ELT_14084_lat")
+BASE_DIR="Base_dir"
+SAMPLES=()
 
 # Loop through to get m6a counts
 for ana in "${SAMPLES[@]}"; do

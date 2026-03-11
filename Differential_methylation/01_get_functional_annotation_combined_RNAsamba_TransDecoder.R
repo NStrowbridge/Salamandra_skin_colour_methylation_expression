@@ -9,7 +9,7 @@ library(dplyr)
 
 ####~housekeeping~~~~~~~~~~~~####
 rm(list=ls()) #clear the environment
-setwd("/Users/nicstrowbridge/Desktop/Nic_PhD_files_2/DirectRNA_Colour_bernardezi/Differential_methylation/02_reference_data") #set wd to reference data folder
+setwd("reference_data") #set wd to reference data folder
 
 ####~get eggnogg annotation~~####
 #transdecoder

@@ -5,17 +5,19 @@
 ####~load libraries~~~~~~~~~~####
 library(BiocManager)
 library(GenomicFeatures)
+BiocManager::install("tximport")
 library(tximport)
+BiocManager::install("edgeR")
 library(edgeR)
 library(svglite)
 #install.packages("locfit")
 library(locfit)
-#BiocManager::install("sva")
+BiocManager::install("sva")
 library(sva)
 
 ####~housekeeping~~~~~~~~~~~~####
 rm(list=ls()) #clear the environment
-setwd("/Users/nicstrowbridge/Desktop/Nic_PhD_files_2/DirectRNA_Colour_bernardezi/Differential_methylation/01_scripts") #set wd to Scripts folder
+setwd("script_folder") #set wd to Scripts folder
 
 ###~~output directory~~~~~~~~####
 output = "../04_edgeR_methylation_transcript_level" #specify where the output should go

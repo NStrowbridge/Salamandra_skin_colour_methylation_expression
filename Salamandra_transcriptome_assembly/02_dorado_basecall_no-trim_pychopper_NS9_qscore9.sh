@@ -4,8 +4,8 @@
 conda activate dorado_basecalling
 
 # Define paths and filenames
-base_dir="/export/home4/2694872s/DirectRNA/NS9"
-output_dir="${base_dir}/20250305_pychopper_NS9_output"
+base_dir="base_dir"
+output_dir="${base_dir}/output_dir"
 mkdir -p "$output_dir"
 
 input_pod5="${base_dir}/NS9_converted.pod5"

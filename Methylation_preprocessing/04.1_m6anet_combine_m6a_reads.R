@@ -2,7 +2,7 @@
 
 ####~housekeeping~~~~~~~~~~~~####
 rm(list=ls()) #clear the environment
-setwd("/Users/nicstrowbridge/Desktop/Nic_PhD_files_2/DirectRNA_Colour_bernardezi/Differential_methylation/01_scripts") #set wd to Scripts folder
+setwd("working_dir_with_scripts") #set wd to Scripts folder
 
 ###~~output directory~~~~~~~~####
 output = "../04_n_methylated_reads" #specify where the output should go

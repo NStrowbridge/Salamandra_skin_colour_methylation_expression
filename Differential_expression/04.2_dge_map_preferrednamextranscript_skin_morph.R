@@ -7,7 +7,7 @@ library(dplyr)
 ####~housekeeping~~~~~~~~~~~~####
 
 rm(list=ls()) #clear the environment
-setwd("/Users/nicstrowbridge/Desktop/Nic_PhD_files_2/DirectRNA_Colour_bernardezi/Differential_expression/01_scripts") #set wd
+setwd("script_folder") #set wd
 count = 00
 
 ###~~output dir~~~~~~~~~~~~~~####

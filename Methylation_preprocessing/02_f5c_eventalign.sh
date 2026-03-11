@@ -6,7 +6,7 @@ SAMPLE_DIR="Sample/Directory"                     # <-- Replace with actual samp
 SLOW5_FILE="Sample_blow5.blow5"                   # <-- Replace with actual BLOW5 file
 FASTQ_FILE="Sample.fastq"                         # <-- Replace with actual FASTQ file
 BAM_FILE="Sample_alignment.bam"                   # <-- Replace with aligned BAM file
-REFERENCE_TRANSCRIPTOME="/export/home4/2694872s/DirectRNA/NS9/pychopper_NS9_dorado_qscore9_output/NS9_dorado_qscore9_trimmed_reads_kraken_conf0.9_rRNA/RNAbloom_assembly_qscore9_pychopper_kraken2_rRNAremoved_k19/rnabloom_transcriptome_kmer19.fasta"
+REFERENCE_TRANSCRIPTOME="transcriptome_path"
 KMER_MODEL="rna004.nucleotide.5mer.model"         # <-- Use only if using RNA004 chemistry
 EVENTALIGN_OUTPUT="Sample_eventalign.txt"         # <-- Output file for eventalign results
 

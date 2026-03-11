@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define paths
-BASE_DIR="/export/home4/2694872s/DirectRNA/NS9" #Directory with fast5 raw data file folder from nanopore
+BASE_DIR="base_dir" #Directory with fast5 raw data file folder from nanopore
 
 # activate conda environment with pod5
 conda activate pod5_conversion

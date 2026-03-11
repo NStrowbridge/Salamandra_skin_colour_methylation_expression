@@ -8,7 +8,7 @@ library(dplyr)
 
 ####~housekeeping~~~~~~~~~~~~####
 rm(list = ls()) # clear the environment
-setwd("/Users/nicstrowbridge/Desktop/Nic_PhD_files_2/DirectRNA_Colour_bernardezi/Differential_expression/01_scripts") # set wd
+setwd("script_folder") # set wd
 
 ####~~output dir~~~~~~~~~~~~~~####
 output <- "../05.3_dge+dm_stridorvstrilat_pvalue_plot_annotation/"

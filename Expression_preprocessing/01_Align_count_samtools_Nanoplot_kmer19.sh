@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define directories and other variables
-DIRECTORY="/export/home4/2694872s/DirectRNA"
+DIRECTORY="base_dir"
 REFERENCE="rnabloom_transcriptome_kmer19.fasta"
 SAMPLES=()
 
