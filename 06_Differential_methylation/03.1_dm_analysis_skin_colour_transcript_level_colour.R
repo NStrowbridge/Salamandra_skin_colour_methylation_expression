@@ -180,3 +180,6 @@ write(genes_fdr_up, "genes_fdr_up.txt")
 genes_fdr_down = row.names(master_fdr_down)
 write(genes_fdr_down, "genes_fdr_down.txt")
 
+####~close loop~~~~~~~~~~~~~~####
+setwd("..")
+}
